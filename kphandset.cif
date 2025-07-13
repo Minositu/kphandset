@@ -1,0 +1,46 @@
+include "BrewApp.bid"
+
+-- Applet Name
+ModRsc {
+   id    = 20, -- Applet base resource id
+   type  = 1,  --RESTYPE_ENCSTRING (see AEEResType.h)
+   data  = EncStringRscData(0xff, "KP Handset Test")
+}
+
+ModRsc {
+   id    = 40, -- Applet base resource id
+   type  = 1,  --RESTYPE_ENCSTRING (see AEEResType.h)
+   data  = EncStringRscData(0xff, "Kim Possible")
+}
+
+ModRsc {
+   id    = 46, -- Applet base resource id
+   type  = 1,  --RESTYPE_ENCSTRING (see AEEResType.h)
+   data  = EncStringRscData(0xff, "display1=w%3A*%2Ch%3A*%2Ca%3A0&display2=w%3A*%2Ch%3A*%2Ca%3A0&display3=w%3A*%2Ch%3A*%2Ca%3A0&display4=w%3A*%2Ch%3A*%2Ca%3A0")
+}
+
+FS_ACL_Grant {
+   path="/card0", {groups = {0x000000}, perms="rw/rw"}
+}
+
+Notifier {
+   clstype = 0x1001007, clsnotify = 0x106E140, mask = 0x000001
+}
+
+PrivLevel {
+   0x0001, 0x0002, 0x0004, 0x0008, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0400, 0xffff
+}
+
+Dependencies {
+   0x0101414E,
+   0x0102C46F,
+   0x01001052,
+}
+
+Applet {
+   appletid       =  AEECLSID_BREWAPP,
+   resbaseid      =  40, -- Applet base resource id
+   applethostid   =  0,
+   type           =  0,
+   flags = 0x0080,
+}

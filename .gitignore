@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+_server.txt
+_admin.txt
+handsetid.txt
+280821.dll
+brew_out/*
+elf2mod.exe
+elf2mod.x
+kphandset.vcxproj.user
