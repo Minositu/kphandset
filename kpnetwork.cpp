@@ -32,9 +32,9 @@ void kpnetwork::InitNetMgr(kphandset* pApp)
 		pApp->network.default_keepalive = ATOI(default_keep_alive);
 	pApp->network.keepalive = pApp->network.default_keepalive;
 	pApp->network.max_wait_before_reconnect = 75000;
-	char* ScriptBuf_sub_29130 = kphelpers::ReadScriptBuf("$MAX_WAIT_BEFORE_RECONNECT");
-	if (*ScriptBuf_sub_29130 && *ScriptBuf_sub_29130 != 36)
-		pApp->network.max_wait_before_reconnect = ATOI(ScriptBuf_sub_29130);
+	char* ScriptBuf_unk_29130 = kphelpers::ReadScriptBuf("$MAX_WAIT_BEFORE_RECONNECT");
+	if (*ScriptBuf_unk_29130 && *ScriptBuf_unk_29130 != 36)
+		pApp->network.max_wait_before_reconnect = ATOI(ScriptBuf_unk_29130);
 	pApp->network.max_wait_before_restart = 105000;
 	char* max_wait_before_restart = kphelpers::ReadScriptBuf("$MAX_WAIT_BEFORE_RESTART");
 	if (*max_wait_before_restart && *max_wait_before_restart != 36)
@@ -356,7 +356,7 @@ void kpnetwork::LogTraffic(kphandset* pApp)
 		++free;
 	for (NetworkMessage* m = pApp->pPop; m; m = m->pMessage)
 		++cached;
-	//kpdebug::kpdebug_sub_2776C((kphandset*)GETAPPINSTANCE(), "NET: IN:%lu/OUT:%lu FREE:%lu", incoming, outgoing, free);
+	//kpdebug::kpdebug_unk_2776C((kphandset*)GETAPPINSTANCE(), "NET: IN:%lu/OUT:%lu FREE:%lu", incoming, outgoing, free);
 	if (cached)
 		kpdebug::AssertLine("NET: CACHED:%lu", cached);
 	if (incoming + outgoing + free + cached != 5)
@@ -367,12 +367,12 @@ void kpnetwork::ParseIncomingMessage(kphandset* pApp, const char* message)
 {
 	if (STRIBEGINS("<state", message))
 	{
-		int v4 = 0;
+		int state = 0;
 		char* episode = kphandset::kphandset_ReadFromScratch(message, "episode");
 		if (episode && *episode && (*episode != pApp->episode[0] || episode[1] != pApp->episode[1]))
 		{
 			kphandset::kpsys_SetPavilion(pApp, episode);
-			v4 = 1;
+			state = 1;
 		}
 		char* mission = kphandset::kphandset_ReadFromScratch(message, "mission");
 		if (mission && *mission && STRICMP(mission, (const char*)&pApp->script))
@@ -380,7 +380,7 @@ void kpnetwork::ParseIncomingMessage(kphandset* pApp, const char* message)
 			char* v8 = kphelpers::ReadScriptFromMemory(pApp, mission);
 			if (v8)
 				kphandset::kpsys_LoadScript(pApp, v8);
-			v4 = 1;
+			state = 1;
 		}
 		char* value = kphandset::kphandset_ReadFromScratch(message, "value");
 		if (value && *value && !STRICMP(value, "doreset"))
@@ -392,7 +392,7 @@ void kpnetwork::ParseIncomingMessage(kphandset* pApp, const char* message)
 			if (*value)
 			{
 				char* v12 = kphelpers::ReadScriptFromMemory(pApp, value);
-				if (v4 || v12 && STRCMP(v12, pApp->kphandset_unk98_1))
+				if (state || v12 && STRCMP(v12, pApp->kphandset_unk98_1))
 				{
 					pApp->kphandset_unk98_1[0] = 0;
 					kphandset::kpsys_ReadScript(pApp, v12);

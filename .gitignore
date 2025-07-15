@@ -31,9 +31,15 @@
 *.out
 *.app
 
+.vs/*
+Debug/*
+Release/*
+clicker-cond-medium-sc.ttf
+
 _server.txt
 _admin.txt
 handsetid.txt
+noautorun.txt
 280821.dll
 brew_out/*
 elf2mod.exe
