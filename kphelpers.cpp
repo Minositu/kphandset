@@ -411,11 +411,13 @@ char* kphelpers::FetchSubToken(char* token)
     return tokenPtr;
 }
 
-void kphelpers::FetchGoToToken(kphandset* pApp, const char* script)
+bool kphelpers::FetchGoToToken(kphandset* pApp, const char* script)
 {
-    if (kphandset::kpscr_Command_Goto(pApp, script))
+    bool returnData = kphandset::kpscr_Command_Goto(pApp, script);
+    if (returnData)
     {
-        char* v3 = kphelpers::FetchMainToken(pApp->script.tokenizer);
-        pApp->script.tokenizer = kphelpers::FetchSubToken(v3);
+        char* mainToken = kphelpers::FetchMainToken(pApp->script.tokenizer);
+        pApp->script.tokenizer = kphelpers::FetchSubToken(mainToken);
     }
+    return returnData;
 }

@@ -176,17 +176,17 @@ public:
 	static void Sys_Init(kphandset* pApp);
 	static int CheckLowBattery(kphandset* pApp);
 	static char* InitScriptMgr(kphandset* pApp);
-	static int sub_28178(kphandset* a1);
+	static int func_28178(kphandset* a1);
 	static kpstartup_client* kpstartupclient_initialize(kphandset* a1);
 	static bool kp_CheckToken(int a1);
 	static void InitFonts(kphandset* a1);
 	static void kpsys_PreloadUIImages(kphandset* pApp);
-	static void sub_1C9EC(kphandset* a1);
+	static void func_1C9EC(kphandset* a1);
 	static void kpscreen_FetchSelectedScreen(kphandset* pApp, kpscreen* a2);
 	static void kpscreen_RefreshDisplay(kphandset* a1);
 	static void* FetchScreen(kphandset* a1);
-	static void kpscr_sub_1DDAC(kpscreen* a1);
-	static void kp_sub_2A334(kpscreen* a1);
+	static void kpscr_func_1DDAC(kpscreen* a1);
+	static void kp_func_2A334(kpscreen* a1);
 	static void kpscript_Free(kphandset* pApp);
 	//
 
@@ -198,21 +198,18 @@ public:
 	static void kpsys_ReadScript(kphandset* pApp, const char* script);
 	static void kpscr_ParseScript(kphandset* pApp);
 	static bool kpscr_Command_Goto(kphandset* pApp, const char* script);
-	static int kp_sub_1ED44(kphandset* pApp, const char* script);
 	static const char* kpscr_GetCommand(char* tokenizer);
-	static bool kpscr_sub_310B8(char* a1);
-	static char* kp_sub_1A530(char* a1);
-	static char* kp_sub_1A494(char* a1);
+	static bool kpscr_func_310B8(char* a1);
 	static void kpsys_PickRandomSong(kphandset* pApp);
-	static void kpscr_sub_2AB8C(kphandset* pApp);
-	static void kpscr_sub_23C18(kphandset* pApp);
+	static void kpscr_func_2AB8C(kphandset* pApp);
+	static void kpscr_func_23C18(kphandset* pApp);
 	//
 
 	//Commands
 	static kpscreen* kpscr_Command_Wait(kphandset* a1, char* a2);
 	static void kpscr_RenderSubtitles(kpBottom* a1);
 	static void kpscr_InitBottomBar(kpBottom* a1, const char* a2, const char* a3);
-	static void kpscr_subtitles_sub_305F4(kpBottom* a1, const char* a2);
+	static void kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2);
 	static bool kpscr_Tokenizer(int a1);
 	static void kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip);
 	static void kpscr_Command_Vibrate(kphandset* a1, char* a2);
@@ -221,7 +218,7 @@ public:
 	//
 
 	//Translation Mgr
-	static void kp_InitTranslatorMgr_sub_27AD8(kphandset* pApp);
+	static void kp_InitTranslatorMgr_func_27AD8(kphandset* pApp);
 	static void LoadStringTranslation(kphandset* pApp, const char* path);
 	static void kptranslator_Free(kphandset* pApp);
 	//

@@ -29,5 +29,5 @@ public:
 
 	static char* FetchMainToken(char* token);
 	static char* FetchSubToken(char* token);
-	static void FetchGoToToken(kphandset* pApp, const char* script);
+	static bool FetchGoToToken(kphandset* pApp, const char* script);
 };
