@@ -68,7 +68,7 @@ struct kpscript
 	void* kpscript_unk12;
 	char pLabel[4096];
 	char* tokenizer;
-	void* kpscript_unk16;
+	char* returnLocation;
 	char* replayBuffer;
 	char* constants;
 	unsigned int constantsLength;
@@ -206,7 +206,6 @@ public:
 	//
 
 	//Commands
-	static kpscreen* kpscr_Command_Wait(kphandset* a1, char* a2);
 	static void kpscr_RenderSubtitles(kpBottom* a1);
 	static void kpscr_InitBottomBar(kpBottom* a1, const char* a2, const char* a3);
 	static void kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2);
@@ -214,6 +213,9 @@ public:
 	static void kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip);
 	static void kpscr_Command_Vibrate(kphandset* a1, char* a2);
 	static void kpscr_Command_Message(kphandset* a1, char* a2);
+	static void kpscr_Command_Mark(kphandset* pApp);
+	static void kpscr_Command_Reboot(kphandset* pApp);
+	static void kpscr_Command_Return(kphandset* pApp);
 	static void kpscr_Command_SetReset(kphandset* pApp, char* a2, char isSet);
 	//
 
@@ -250,10 +252,6 @@ public:
 	static char* kpstartupadmin_ReadFromAdminPath(kphandset* pApp, char* file, char* extension);
 	static void kpstartupadmin_Init(kpstartup_admin* a1, int a2);
 	static void kpstartupadmin_RefreshDisplay(kpstartup_admin* a1, char* a2, char a3);
-	//
-
-	//kpscreen_wait
-	static void kpscr_Wait_Init(kpstill* a1, int a2);
 	//
 
 	//kpscreen_enter

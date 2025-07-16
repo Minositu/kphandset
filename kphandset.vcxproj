@@ -167,6 +167,7 @@
     <ClCompile Include="kpstill.cpp" />
     <ClCompile Include="kptimeout.cpp" />
     <ClCompile Include="kpupdate.cpp" />
+    <ClCompile Include="kpwait.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kpaudio.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="kpstill.h" />
     <ClInclude Include="kptimeout.h" />
     <ClInclude Include="kpupdate.h" />
+    <ClInclude Include="kpwait.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

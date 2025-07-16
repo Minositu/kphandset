@@ -90,6 +90,7 @@ INCLUDES AND VARIABLE DEFINITIONS
 #include "kptimeout.h"
 #include "kpcutscene.h"
 #include "kpstill.h"
+#include "kpwait.h"
 #include "AEETelephone.h"
 #include "AEESMS.h"
 
@@ -972,7 +973,7 @@ void kphandset::kpsys_ClearScript(kphandset* pApp)
     pApp->script.pLabel[0] = 0;
     pApp->script.kpscript_unk20 = 0;
     pApp->script.tokenizer = 0;
-    pApp->script.kpscript_unk16 = 0;
+    pApp->script.returnLocation = 0;
     pApp->script.replayBuffer = 0;
 }
 
@@ -1065,7 +1066,7 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
             }*/
             else if (STRCMP("wait", command) == 0)
             {
-                screen = kphandset::kpscr_Command_Wait(pApp, pApp->kphandset_unk99);
+                screen = kpwait::ExecuteCommand(pApp, pApp->kphandset_unk99);
             }
             /*else if (STRCMP("missionmenu", command) == 0)
             {
@@ -1137,19 +1138,19 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
             else if (STRCMP("clear", command) == 0)
             {
                 MEMSET(pApp->kphandset_unk150, 0, 9);
-            }
+            }*/
             else if (STRCMP("mark", command) == 0)
             {
-                kpscr_Command_Mark((int)pApp);
+                kphandset::kpscr_Command_Mark(pApp);
             }
             else if (STRCMP("reboot", command) == 0)
             {
-                kpscr_Command_Reboot((int)pApp);
+                kphandset::kpscr_Command_Reboot(pApp);
             }
             else if (STRCMP("return", command) == 0)
             {
-                kpscr_Command_Return((int)pApp);
-            }*/
+                kphandset::kpscr_Command_Return(pApp);
+            }
             else if (STRCMP("set", command) == 0)
             {
                 char* setBuf = (char*)kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
@@ -1270,23 +1271,6 @@ void kphandset::kpscr_func_23C18(kphandset* pApp)
         pApp->script.tokenizer = pApp->script.replayBuffer;
         kphandset::kpscr_func_1DDAC(pApp->pSelectedStartup);
     }
-}
-
-kpscreen* kphandset::kpscr_Command_Wait(kphandset* a1, char* a2)
-{
-    a1->kphandset_unk98_1[0] = 0;
-    kpstill* screen = (kpstill*)kpstill::ExecuteCommand(a1, a2, (char*)"ui_waiting");
-    if (screen)
-    {
-        screen->InitPtr = (void (*)(kpscreen*, int))kphandset::kpscr_Wait_Init;
-        char* ScriptBuf = kphelpers::ReadScriptBuf("$WAIT_PING");
-        screen->still_pingTime = ATOI(ScriptBuf);
-        char* keepAliveBuf = kphelpers::ReadScriptBuf("$WAIT_KEEPALIVE");
-        screen->still_keepalive = ATOI(keepAliveBuf);
-        screen->kpscreen_still_unk8_1 = 0;
-        screen->kpscreen_still_unk8_2 = 0;
-    }
-    return screen;
 }
 
 void kphandset::kpscr_RenderSubtitles(kpBottom* a1)
@@ -1440,6 +1424,21 @@ void kphandset::kpscr_Command_Vibrate(kphandset* a1, char* a2)
         if (sound)
             ISOUND_Release(sound);
     }
+}
+void kphandset::kpscr_Command_Mark(kphandset* pApp)
+{
+    pApp->script.returnLocation = pApp->script.tokenizer;
+}
+void kphandset::kpscr_Command_Reboot(kphandset* pApp)
+{
+    ISHELL_PostEvent(pApp->m_pIShell, AEECLSID_KPHANDSET, EVT_KPHANDSET_APP_RESTART, 0, 0);
+}
+void kphandset::kpscr_Command_Return(kphandset* pApp)
+{
+    if (pApp->script.returnLocation)
+        pApp->script.tokenizer = pApp->script.returnLocation;
+    else
+        kpdebug::Print("SCR: Return to invalid return location");
 }
 void kphandset::kpscr_Command_SetReset(kphandset* pApp, char* a2, char isSet)
 {
@@ -1881,21 +1880,6 @@ void kphandset::kpstartupadmin_RefreshDisplay(kpstartup_admin* a1, char* a2, cha
     }
 }
 //
-
-void kphandset::kpscr_Wait_Init(kpstill* a1, int a2)
-{
-    kpstill::Init(a1, a2);
-    if (a2)
-    {
-        kphandset* instance = (kphandset*)GETAPPINSTANCE();
-        //kpscr_func_1CEBC(a1);
-        kphandset::kpscr_func_2AB8C(instance);
-    }
-    else
-    {
-        //kpscr_func_1D41C(a1);
-    }
-}
 
 /*===========================================================================
 

@@ -9,14 +9,14 @@ public:
 	uint8 still_frameCount;
 	void* kpscreen_still_unk3;								//
 	kpBottom* bottomScreen;
-	int kpscreen_still_unk5_timer;							//
+	int serverTick;
 	int still_pingTime;
 	int still_keepalive;
-	uint8 kpscreen_still_unk8_1;							//
-	uint8 kpscreen_still_unk8_2;							//
+	uint8 advance_enabled;
+	uint8 replay_enabled;
 	char still_audioFile[32];
-	uint8 kpscreen_still_unk10;								//
-	uint8 kpscreen_still_unk11;								//
+	uint8 audio_advance;
+	uint8 looping;
 
 	static kpscreen* ExecuteCommand(kphandset* pApp, char* commandBuffer, char* uiImage);
 	static void RefreshDisplay(kpstill* pScreen);

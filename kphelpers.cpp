@@ -6,7 +6,7 @@ IImage* kphelpers::LoadResObject(kphandset* pApp, const char* pImagePath)
 {
     IImage* pImage = 0;
     if (pImagePath && *pImagePath)
-        pImage = (IImage*)ISHELL_LoadResObject(pApp->m_pIShell, pImagePath, 0, 0);
+        pImage = ISHELL_LoadResImage(pApp->m_pIShell, pImagePath, 0, 0);
     if (!pImage)
         kpdebug::Assert("IMG: Unable to load %s", pImagePath, 0);
     return pImage;
@@ -365,7 +365,7 @@ void kphelpers::ParseTokenizer(char* tokenizerBuf, const char* tokenizer)
 {
     while (*tokenizer && kphelpers::CheckToken(*(unsigned char*)tokenizer))
         ++tokenizer;
-    unsigned int tokenLength = (unsigned int)&STRCHREND(tokenizer, '\n')[-(int)tokenizer];
+    size_t tokenLength = (unsigned short)&STRCHREND(tokenizer, '\n')[-(int)tokenizer];
     if (tokenLength >= 192)
     {
         tokenLength = 191;

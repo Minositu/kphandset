@@ -14,17 +14,16 @@ kpscreen* kpstill::ExecuteCommand(kphandset* pApp, char* commandBuffer, char* ui
         pScreen->DrawPtr = (void (*)(kpscreen*))kpstill::Draw;
         pScreen->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpstill::HandleEvent;
         pScreen->ReleasePtr = (void (*)(kpscreen*))kpstill::Release;
-        pScreen->kpscreen_still_unk8_1 = 1;
-        pScreen->kpscreen_still_unk8_2 = 1;
-        pScreen->kpscreen_still_unk10 = 0;
-        pScreen->kpscreen_still_unk11 = 0;
+        pScreen->advance_enabled = 1;
+        pScreen->replay_enabled = 1;
+        pScreen->audio_advance = 0;
+        pScreen->looping = 0;
         char* text = 0;
         char* caption = 0;
         while (commandBuffer && **((uint8**)commandBuffer + 48))
         {
             const char* Command = kphandset::kpscr_GetCommand(commandBuffer);
-            if (!STRBEGINS("png:", Command)
-                || pScreen->still_Image)
+            if (!STRBEGINS("png:", Command) || pScreen->still_Image)
             {
                 if (STRBEGINS("text:", Command))
                 {
@@ -39,15 +38,15 @@ kpscreen* kpstill::ExecuteCommand(kphandset* pApp, char* commandBuffer, char* ui
                 else if (STRBEGINS("delay:", Command))
                 {
                     char* v14 = kphelpers::ReadScriptBuf(Command + 6);
-                    pScreen->kpscreen_still_unk5_timer = ATOI(v14);
+                    pScreen->serverTick = ATOI(v14);
                 }
                 else if (STRBEGINS("advance:", Command) && STRBEGINS("no", kphelpers::ReadScriptBuf(Command + 8)))
                 {
-                    pScreen->kpscreen_still_unk8_1 = 0;
+                    pScreen->advance_enabled = 0;
                 }
                 else if (STRBEGINS("replay:", Command) && STRBEGINS("no", kphelpers::ReadScriptBuf(Command + 7)))
                 {
-                    pScreen->kpscreen_still_unk8_2 = 0;
+                    pScreen->replay_enabled = 0;
                 }
                 else if (STRBEGINS("audio:", Command))
                 {
@@ -56,13 +55,13 @@ kpscreen* kpstill::ExecuteCommand(kphandset* pApp, char* commandBuffer, char* ui
                 }
                 else if (STRBEGINS("audio-advance:", Command) && STRBEGINS("yes", kphelpers::ReadScriptBuf(Command + 14)))
                 {
-                    pScreen->kpscreen_still_unk10 = 1;
-                    pScreen->kpscreen_still_unk11 = 0;
+                    pScreen->audio_advance = 1;
+                    pScreen->looping = 0;
                 }
                 else if (STRBEGINS("loop:", Command) && STRBEGINS("yes", kphelpers::ReadScriptBuf(Command + 5)))
                 {
-                    pScreen->kpscreen_still_unk10 = 0;
-                    pScreen->kpscreen_still_unk11 = 1;
+                    pScreen->audio_advance = 0;
+                    pScreen->looping = 1;
                 }
                 else if (STRBEGINS("help:", Command))
                 {
@@ -146,13 +145,13 @@ bool kpstill::HandleEvent(kpstill* pScreen, AEEEvent eCode, uint16 wParam, uint3
     kphandset* instance = (kphandset*)GETAPPINSTANCE();
     if (eCode == EVT_KEY && wParam == AVK_SELECT)
     {
-        if (pScreen->kpscreen_still_unk8_1)
+        if (pScreen->advance_enabled)
             kpstill::func_2DB80(pScreen);
         handled = 1;
     }
     else if (eCode == EVT_KEY && wParam == AVK_SOFT1)
     {
-        if (!pScreen->retrigger_buffer[0] && pScreen->kpscreen_still_unk8_2)
+        if (!pScreen->retrigger_buffer[0] && pScreen->replay_enabled)
         {
             kphandset::kpscr_func_23C18(instance);
             handled = 1;
@@ -160,11 +159,11 @@ bool kpstill::HandleEvent(kpstill* pScreen, AEEEvent eCode, uint16 wParam, uint3
     }
     else if (eCode == EVT_KPHANDSET_APP_AUDIO_INIT)
     {
-        if (pScreen->kpscreen_still_unk10)
+        if (pScreen->audio_advance)
         {
             kpstill::func_2DB80(pScreen);
         }
-        else if (pScreen->kpscreen_still_unk11 && pScreen->still_audioFile[0])
+        else if (pScreen->looping && pScreen->still_audioFile[0])
         {
             kpaudio::LoadAudioFile(pScreen->still_audioFile);
         }
@@ -186,7 +185,8 @@ void kpstill::Draw(kpstill* pScreen)
         {
             unsigned int v3 = GETTIMEMS();
             unsigned int v4 = (v3 / 100u);
-            unsigned int v5 = (v4 / pScreen->still_frameCount);
+            unsigned int v5 = (v4 % pScreen->still_frameCount);
+            DBGPRINTF("%d, %d, %d", v3, v4, v5);
             IIMAGE_DrawFrame(pScreen->still_Image, v5, 0, 0);
         }
     }
@@ -194,11 +194,11 @@ void kpstill::Draw(kpstill* pScreen)
     //    kpscr_sub_30F18((int)pScreen->kpscreen_still_unk3);
     if (pScreen->bottomScreen)
         kphandset::kpscr_RenderSubtitles(pScreen->bottomScreen);
-    if (pScreen->kpscreen_still_unk8_1 && !pScreen->kpscreen_still_unk5_timer && (!pScreen->still_audioFile[0] || !pScreen->kpscreen_still_unk10) && instance->ui_ok_Interface)
+    if (pScreen->advance_enabled && !pScreen->serverTick && (!pScreen->still_audioFile[0] || !pScreen->audio_advance) && instance->ui_ok_Interface)
     {
         IIMAGE_Draw(instance->ui_ok_Interface, 0, 0);
     }
-    if (!pScreen->retrigger_buffer[0] && pScreen->kpscreen_still_unk8_2 && instance->ui_replay_Interface)
+    if (!pScreen->retrigger_buffer[0] && pScreen->replay_enabled && instance->ui_replay_Interface)
         IIMAGE_Draw(instance->ui_replay_Interface, 0, 0);
     kphandset::kpscreen_Draw((kpstartup_client*)pScreen);
 }
@@ -232,8 +232,8 @@ void kpstill::Init(kpstill* pScreen, int initialize)
         else
             instance->network.keepalive = instance->network.default_keepalive;
     }
-    if (pScreen->kpscreen_still_unk5_timer && initialize)
-        ISHELL_SetTimer(instance->m_pIShell, pScreen->kpscreen_still_unk5_timer, (PFNNOTIFY)kpstill::func_2DB80, pScreen);
+    if (pScreen->serverTick && initialize)
+        ISHELL_SetTimer(instance->m_pIShell, pScreen->serverTick, (PFNNOTIFY)kpstill::func_2DB80, pScreen);
     if (initialize)
     {
         if (pScreen->still_frameCount > 1u)

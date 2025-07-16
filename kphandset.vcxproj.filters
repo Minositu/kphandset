@@ -54,6 +54,9 @@
     <ClCompile Include="kpstill.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="kpwait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kphandset.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kpstill.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kpwait.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
