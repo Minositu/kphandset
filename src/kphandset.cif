@@ -1,4 +1,4 @@
-include "BrewApp.bid"
+include "kphandset.bid"
 
 -- Applet Name
 ModRsc {
