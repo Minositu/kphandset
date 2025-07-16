@@ -2,11 +2,11 @@
 #include "kphandset.h"
 #include "kpdebug.h"
 
-IImage* kphelpers::LoadResObject(kphandset* pApp, const char* pImagePath)
+IImage* kphelpers::LoadResImage(kphandset* pApp, const char* pImagePath)
 {
     IImage* pImage = 0;
     if (pImagePath && *pImagePath)
-        pImage = ISHELL_LoadResImage(pApp->m_pIShell, pImagePath, 0, 0);
+        pImage = ISHELL_LoadResImage(pApp->m_pIShell, pImagePath, 0);
     if (!pImage)
         kpdebug::Assert("IMG: Unable to load %s", pImagePath, 0);
     return pImage;
@@ -39,7 +39,7 @@ IImage* kphelpers::LoadUIImages(kphandset* pApp, char* pName)
     {
         char* image = kphelpers::ReadToScratch(pApp, pName, (char*)".png");
         if (image && *image)
-            return kphelpers::LoadResObject(pApp, image);
+            return kphelpers::LoadResImage(pApp, image);
     }
     return selectedInterface;
 }
@@ -55,7 +55,7 @@ IImage* kphelpers::PreloadFilmstrip(kphandset* pApp, char* pFilmstrip)
     uint32 UpTimeMS = -1;
     int use = IMAGE_CACHE_SIZE;
     int filmstripInBuffer = 0;
-    IImage* Image = nullptr;
+    IImage* Image = 0;
     for (int i = 0; i < IMAGE_CACHE_SIZE; ++i)
     {
         if (pApp->filmstripBuffer[i].Image)
@@ -212,6 +212,15 @@ char* kphelpers::ReadFromAppPath(kphandset* pApp, char* file, const char* fallba
     return scratch;
 }
 
+char* kphelpers::ReadFromAdminPath(kphandset* pApp, char* file, char* extension)
+{
+    char* scratch = pApp->scratch;
+    if (file == pApp->scratch)
+        scratch = pApp->kphandset_unk154;
+    SNPRINTF(scratch, 400u, "fs:/card0/admin/%s%s", file, extension);
+    return scratch;
+}
+
 char* kphelpers::BuildPath(kphandset* pApp, char* pFilename, unsigned int filenameLength)
 {
     char* filenamePtr = pFilename;
@@ -365,7 +374,7 @@ void kphelpers::ParseTokenizer(char* tokenizerBuf, const char* tokenizer)
 {
     while (*tokenizer && kphelpers::CheckToken(*(unsigned char*)tokenizer))
         ++tokenizer;
-    size_t tokenLength = (unsigned short)&STRCHREND(tokenizer, '\n')[-(int)tokenizer];
+    unsigned int tokenLength = (unsigned int)&STRCHREND(tokenizer, '\n')[-(int)tokenizer];
     if (tokenLength >= 192)
     {
         tokenLength = 191;

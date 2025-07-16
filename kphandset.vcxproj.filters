@@ -21,75 +21,87 @@
     <ClCompile Include="..\..\src\AEEModGen.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kphandset.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kpdebug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kpaudio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kphelpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kpcamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kpnetwork.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kptimeout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kpupdate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\AEEMediaUtil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kpcutscene.cpp">
+    <ClCompile Include="src\private\kpdebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kpstill.cpp">
+    <ClCompile Include="src\private\kphandset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kpwait.cpp">
+    <ClCompile Include="src\private\kphelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpnetwork.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpstill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kptimeout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpupdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpwait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpadmin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpaudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpcamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpclient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\private\kpcutscene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="kphandset.h">
+    <ClInclude Include="src\public\kpcamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpdebug.h">
+    <ClInclude Include="src\public\kpclient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpaudio.h">
+    <ClInclude Include="src\public\kpcutscene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpnetwork.h">
+    <ClInclude Include="src\public\kpdebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kphelpers.h">
+    <ClInclude Include="src\public\kphandset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kptimeout.h">
+    <ClInclude Include="src\public\kphelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpupdate.h">
+    <ClInclude Include="src\public\kpnetwork.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpcamera.h">
+    <ClInclude Include="src\public\kpstill.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpcutscene.h">
+    <ClInclude Include="src\public\kptimeout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpstill.h">
+    <ClInclude Include="src\public\kpupdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kpwait.h">
+    <ClInclude Include="src\public\kpwait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\public\kpadmin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\public\kpaudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

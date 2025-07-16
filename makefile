@@ -1,4 +1,4 @@
-INCDIRS=-I ../../inc/ -I ../../../../../../BREWUIWidgets_2.0.1/widgets/inc/ -I ../../../../../../BREWFontExtensions_2.1.5/btfe/inc/
+INCDIRS=-I ../../inc/ -I ../../../../../../BREWUIWidgets_2.0.1/widgets/inc/ -I ../../../../../../BREWFontExtensions_2.1.5/btfe/inc/ -I src/ -I src/public -I src/private/
 
 CFLAGS=-c $(INCDIRS) -fno-builtin -ffunction-sections -O2 -DDYNAMIC_APP -DBREW -DHAVE_CONFIG_H -DDEBUG
 LDFLAGS+= -nostdlib -nodefaultlibs -nostartfiles -Wl,--emit-relocs -Wl,-Map,brew_out/kphandset.map -Wl,--cref
@@ -7,8 +7,10 @@ OBJDIR=brew_out
 OUTPUT=$(OBJDIR)/kphandset
 
 SRC_KPHANDSET = \
+	kpadmin.o \
 	kpaudio.o \
 	kpcamera.o \
+	kpclient.o \
 	kpcutscene.o \
 	kpdebug.o \
 	kphandset.o \
@@ -16,7 +18,8 @@ SRC_KPHANDSET = \
 	kpnetwork.o \
 	kpstill.o \
 	kptimeout.o \
-	kpupdate.o
+	kpupdate.o \
+	kpwait.o \
 
 OBJS += $(addprefix $(OBJDIR)/, $(SRC_KPHANDSET))
 
@@ -33,7 +36,7 @@ $(OUTPUT).elf: $(OBJDIR)/AEEModGen.o $(OBJDIR)/AEEAppGen.o $(OBJDIR)/AEEMediaUti
 $(MKDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/%.o: %.cpp %.h
+$(OBJDIR)/%.o: src/private/%.cpp src/public/%.h
 	@echo [Compiling $<]
 	arm-none-eabi-g++ $(CFLAGS) -c $< -o $@
 

@@ -58,7 +58,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\BREWUIWidgets_2.0.1\widgets\inc;..\..\..\..\..\..\BREWFontExtensions_2.1.5\btfe\inc;..\..\inc;$(BREWDIR)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\BREWUIWidgets_2.0.1\widgets\inc;..\..\..\..\..\..\BREWFontExtensions_2.1.5\btfe\inc;..\..\inc;$(BREWDIR)\inc;src\public;src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AEE_SIMULATOR;T_WINNT;_DEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -101,7 +101,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\BREWUIWidgets_2.0.1\widgets\inc;..\..\..\..\..\..\BREWFontExtensions_2.1.5\btfe\inc;..\..\inc;$(BREWDIR)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\BREWUIWidgets_2.0.1\widgets\inc;..\..\..\..\..\..\BREWFontExtensions_2.1.5\btfe\inc;..\..\inc;$(BREWDIR)\inc;src\public;src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AEE_SIMULATOR;NDEBUG;KPHANDSET_EXPORTS;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -151,36 +151,34 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AEE_SIMULATOR;NDEBUG;_MBCS;KPHANDSET_EXPORTS;WIN32;_WINDOWS;_USRDLL</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="kpaudio.cpp" />
-    <ClCompile Include="kpcamera.cpp" />
-    <ClCompile Include="kpcutscene.cpp" />
-    <ClCompile Include="kpdebug.cpp" />
-    <ClCompile Include="kphandset.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AEE_SIMULATOR;T_WINNT;_DEBUG;_MBCS;WIN32;_WINDOWS;_USRDLL</PreprocessorDefinitions>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AEE_SIMULATOR;NDEBUG;_MBCS;KPHANDSET_EXPORTS;WIN32;_WINDOWS;_USRDLL</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="kphelpers.cpp" />
-    <ClCompile Include="kpnetwork.cpp" />
-    <ClCompile Include="kpstill.cpp" />
-    <ClCompile Include="kptimeout.cpp" />
-    <ClCompile Include="kpupdate.cpp" />
-    <ClCompile Include="kpwait.cpp" />
+    <ClCompile Include="src\private\kpadmin.cpp" />
+    <ClCompile Include="src\private\kpaudio.cpp" />
+    <ClCompile Include="src\private\kpcamera.cpp" />
+    <ClCompile Include="src\private\kpclient.cpp" />
+    <ClCompile Include="src\private\kpcutscene.cpp" />
+    <ClCompile Include="src\private\kpdebug.cpp" />
+    <ClCompile Include="src\private\kphandset.cpp" />
+    <ClCompile Include="src\private\kphelpers.cpp" />
+    <ClCompile Include="src\private\kpnetwork.cpp" />
+    <ClCompile Include="src\private\kpstill.cpp" />
+    <ClCompile Include="src\private\kptimeout.cpp" />
+    <ClCompile Include="src\private\kpupdate.cpp" />
+    <ClCompile Include="src\private\kpwait.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="kpaudio.h" />
-    <ClInclude Include="kpcamera.h" />
-    <ClInclude Include="kpcutscene.h" />
-    <ClInclude Include="kpdebug.h" />
-    <ClInclude Include="kphandset.h" />
-    <ClInclude Include="kphelpers.h" />
-    <ClInclude Include="kpnetwork.h" />
-    <ClInclude Include="kpstill.h" />
-    <ClInclude Include="kptimeout.h" />
-    <ClInclude Include="kpupdate.h" />
-    <ClInclude Include="kpwait.h" />
+    <ClInclude Include="src\public\kpadmin.h" />
+    <ClInclude Include="src\public\kpaudio.h" />
+    <ClInclude Include="src\public\kpcamera.h" />
+    <ClInclude Include="src\public\kpclient.h" />
+    <ClInclude Include="src\public\kpcutscene.h" />
+    <ClInclude Include="src\public\kpdebug.h" />
+    <ClInclude Include="src\public\kphandset.h" />
+    <ClInclude Include="src\public\kphelpers.h" />
+    <ClInclude Include="src\public\kpnetwork.h" />
+    <ClInclude Include="src\public\kpstill.h" />
+    <ClInclude Include="src\public\kptimeout.h" />
+    <ClInclude Include="src\public\kpupdate.h" />
+    <ClInclude Include="src\public\kpwait.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

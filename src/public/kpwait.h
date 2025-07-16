@@ -15,7 +15,6 @@ public:
 	static void ServerTickTimer(kpwait* pScreen);
 	static void CancelTimers(kpwait* pScreen);
 
-
 	static void Init(kpwait* pScreen, int initialize);
 };
 

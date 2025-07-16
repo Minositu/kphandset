@@ -89,8 +89,10 @@ INCLUDES AND VARIABLE DEFINITIONS
 #include "kpnetwork.h"
 #include "kptimeout.h"
 #include "kpcutscene.h"
+#include "kpadmin.h"
 #include "kpstill.h"
 #include "kpwait.h"
+#include "kpclient.h"
 #include "AEETelephone.h"
 #include "AEESMS.h"
 
@@ -601,7 +603,7 @@ void kphandset::Sys_Init(kphandset* pApp)
     pApp->timeSeconds = GETTIMESECONDS();
     if (pApp->adminMode)
     {
-        kpstartup_admin* screen = kphandset::kpstartupadmin_initialize(pApp);
+        kpscreen* screen = kpadmin::ExecuteCommand(pApp);
         kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
         FileInfo info;
         if (IFILEMGR_GetInfo(pApp->pFileMgr, "fs:/card0/jj", &info) != 1)
@@ -609,7 +611,7 @@ void kphandset::Sys_Init(kphandset* pApp)
     }
     else
     {
-        kpstartup_client* screen = (kpstartup_client*)kphandset::kpstartupclient_initialize(pApp);
+        kpscreen* screen = (kpscreen*)kpclient::ExecuteCommand(pApp);
         kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
     }
     ISHELL_RegisterNotify(pApp->m_pIShell, AEECLSID_KPHANDSET, AEECLSID_PHONENOTIFIER, AEET_NMASK_NEW_CALLDESC);
@@ -635,123 +637,6 @@ bool kphandset::SDCheck(kphandset* pApp)
     }
     return sdCheck;
 }
-
-
-
-void kphandset::kpstartupclient_Init(kpstartup_client* pScreen, int a2)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    if (pScreen->pNotice)
-        ISTATIC_SetActive(pScreen->pNotice, a2);
-    if (pScreen->pVersion)
-        ISTATIC_SetActive(pScreen->pVersion, a2);
-    if (pScreen->pHandsetID)
-    {
-        ISTATIC_SetActive(pScreen->pHandsetID, a2);
-        if (instance->lowBattery)
-        {
-            ISTATIC_SetText(pScreen->pHandsetID, 0, (AECHAR*)"LOW BATTERY", AEE_FONT_USER_2, AEE_FONT_USER_2);
-        }
-    }
-    if (a2)
-    {
-        kpnetwork::ClearExistingConnection(instance);
-        ISHELL_SetTimer(instance->m_pIShell, 15000, (PFNNOTIFY)kpnetwork::Initialize, instance);
-    }
-    else
-    {
-        ISHELL_CancelTimer(instance->m_pIShell, (PFNNOTIFY)kpnetwork::Initialize, instance);
-    }
-    if (a2 == 1)
-        kptimeout::ClearTimeout(instance);
-}
-void kphandset::kpstartupclient_Draw(kpstartup_client* pScreen)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    AEERect rect;
-    rect.x = 0;
-    rect.y = 0;
-    rect.dx = instance->pBitmapInfo.cx;
-    rect.dy = instance->pBitmapInfo.cy;
-    if (pScreen->kpstartup_client_unk1)
-        IIMAGE_Draw(pScreen->kpstartup_client_unk1, 0, 0);
-    else
-        IDISPLAY_DrawRect(instance->m_pIDisplay, &rect, -1, -1, 2u);
-    if (pScreen->pVersion)
-        ISTATIC_Redraw(pScreen->pVersion);
-    if (pScreen->pNotice)
-        ISTATIC_Redraw(pScreen->pNotice);
-    if (pScreen->pHandsetID)
-        ISTATIC_Redraw(pScreen->pHandsetID);
-    kphandset::kpscreen_Draw(pScreen);
-}
-bool kphandset::kpstartupclient_HandleEvent(kpstartup_client* pScreen, AEEEvent eCode, uint16 wParam, uint32 dwParam)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    int initialized = 0;
-    if (eCode == EVT_KEY && wParam == 57397)
-    {
-        if (instance->adminMode)
-        {
-            kpstartup_admin* screen = kphandset::kpstartupadmin_initialize(instance);
-            kphandset::kpscreen_FetchSelectedScreen(instance, screen);
-        }
-        else
-        {
-            kpnetwork::Initialize(instance);
-        }
-        initialized = 1;
-    }
-    else if (eCode == EVT_KPHANDSET_APP_NETWORK_INCOMING_MESSAGE)
-    {
-        ISHELL_CancelTimer(instance->m_pIShell, (PFNNOTIFY)kpnetwork::Initialize, instance);
-    }
-    else if (eCode == EVT_FLIP)
-    {
-        if (wParam == 1)
-        {
-            kpdebug::Print((char*)"STARTUP: Attempting connection");
-            kpnetwork::StartSocketPingTimer(instance, instance->network.base_ping);
-            kpnetwork::ClearExistingConnection(instance);
-            ISHELL_SetTimer(instance->m_pIShell, 15000, (PFNNOTIFY)kpnetwork::Initialize, instance);
-        }
-        else
-        {
-            kpdebug::Print((char*)"STARTUP: Cancelling connection");
-            kpnetwork::StartSocketPingTimer(instance, 0);
-            kpnetwork::CancelConnection(instance);
-            ISHELL_CancelTimer(instance->m_pIShell, (PFNNOTIFY)kpnetwork::Initialize, instance);
-        }
-    }
-    return initialized || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-}
-void kphandset::kpstartupclient_Release(kpstartup_client* pScreen)
-{
-    if (pScreen->kpstartup_client_unk1)
-    {
-        IIMAGE_Release(pScreen->kpstartup_client_unk1);
-        pScreen->kpstartup_client_unk1 = 0;
-    }
-    if (pScreen->pHandsetID)
-    {
-        ISTATIC_Release(pScreen->pHandsetID);
-        pScreen->pHandsetID = 0;
-    }
-    if (pScreen->pNotice)
-    {
-        ISTATIC_Release(pScreen->pNotice);
-        pScreen->pNotice = 0;
-    }
-    if (pScreen->pVersion)
-    {
-        ISTATIC_Release(pScreen->pVersion);
-        pScreen->pVersion = 0;
-    }
-    kphandset::kpscreen_Release(pScreen);
-}
-
-
-
 
 void kphandset::kpscr_func_1DDAC(kpscreen* a1)
 {
@@ -803,57 +688,6 @@ void* kphandset::FetchScreen(kphandset* pApp)
     return p_kpstartup2;
 }
 
-kpstartup_client* kphandset::kpstartupclient_initialize(kphandset* a1)
-{
-    kpstartup_client* client = (kpstartup_client*)kphandset::FetchScreen(a1);
-    if (client)
-    {
-        kphandset::kpscreen_Initialize(client);
-        client->InitPtr = (void (*)(kpscreen*, int))kphandset::kpstartupclient_Init;
-        client->DrawPtr = (void (*)(kpscreen*))kphandset::kpstartupclient_Draw;
-        client->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kphandset::kpstartupclient_HandleEvent;
-        client->ReleasePtr = (void (*)(kpscreen*))kphandset::kpstartupclient_Release;
-        AEERect rect;
-        rect.x = 0;
-        rect.y = 0;
-        rect.dx = a1->pBitmapInfo.cx;
-        rect.dy = a1->pBitmapInfo.cy;
-        if (!ISHELL_CreateInstance(a1->m_pIShell, AEECLSID_STATIC, (void**)&client->pHandsetID))
-        {
-            int d;
-            int a;
-            IDISPLAY_GetFontMetrics(a1->m_pIDisplay, AEE_FONT_USER_2, &a, &d);
-            rect.dy = a + d;
-            rect.y = a1->pBitmapInfo.cy - (a + d);
-            ISTATIC_SetRect(client->pHandsetID, &rect);
-            ISTATIC_SetProperties(client->pHandsetID, ST_ASCII | ST_CENTERTEXT);
-            ISTATIC_SetText(client->pHandsetID, 0, (AECHAR*)a1->handsetID, AEE_FONT_USER_2, AEE_FONT_USER_2);
-        }
-        if (!ISHELL_CreateInstance(a1->m_pIShell, AEECLSID_STATIC, (void**)&client->pNotice))
-        {
-            rect.dy = rect.y - 30;
-            rect.y = 30;
-            ISTATIC_SetRect(client->pNotice, &rect);
-            ISTATIC_SetProperties(client->pNotice, ST_ASCII | ST_CENTERTEXT);
-            char* noticePath = kphelpers::ReadFromRootSD(a1, "notice", ".txt");
-            char* noticeChar = kphelpers::LoadStringFromFile(a1, noticePath, 0, 0);
-            ISTATIC_SetText(client->pNotice, 0, (AECHAR*)noticeChar, AEE_FONT_LARGE, AEE_FONT_LARGE);
-            if (noticeChar)
-                FREE(noticeChar);
-        }
-        if (!ISHELL_CreateInstance(a1->m_pIShell, AEECLSID_STATIC, (void**)&client->pVersion))
-        {
-            SNPRINTF(a1->scratch, 400u, "ver %s:%s", "1004-22", (const char*)&a1->contentVersion);
-            rect.dy = 30;
-            rect.y = 0;
-            ISTATIC_SetRect(client->pVersion, &rect);
-            ISTATIC_SetProperties(client->pVersion, ST_ASCII | ST_CENTERTEXT);
-            ISTATIC_SetText(client->pVersion, 0, (AECHAR*)a1->scratch, AEE_FONT_LARGE, AEE_FONT_LARGE);
-        }
-    }
-    return client;
-}
-
 void kphandset::kpscreen_FetchSelectedScreen(kphandset* pApp, kpscreen* a2)
 {
     if (pApp->pSelectedStartup != a2)
@@ -885,7 +719,7 @@ void kphandset::StartingApp(kphandset* pApp)
     {
         if (!pApp->pSelectedStartup)
         {
-            kpstartup_client* screen = (kpstartup_client*)kphandset::kpstartupclient_initialize(pApp);
+            kpscreen* screen = (kpscreen*)kpclient::ExecuteCommand(pApp);
             kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
         }
     }
@@ -1579,305 +1413,6 @@ void kphandset::kpscreen_Initialize(kpscreen* pScreen)
     pScreen->help_buffer[0] = 0;
     pScreen->retrigger_buffer[0] = 0;
     pScreen->kpstartup_unk11_1 = 0;
-}
-//
-
-//kpscreen_admin
-bool kphandset::kpstartupadmin_HandleEvent(kpstartup_admin* pScreen, AEEEvent eCode, uint16 wParam, uint32 dwParam)
-{
-    int returnVal = 0;
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    if (pScreen->pMenuCtl)
-        returnVal = IMENUCTL_HandleEvent(pScreen->pMenuCtl, eCode, wParam, dwParam) != 0;
-    if(!returnVal && pScreen->pHandsetID)
-        returnVal = ISTATIC_HandleEvent(pScreen->pHandsetID, eCode, wParam, dwParam) != 0;
-    switch (eCode)
-    {
-        case EVT_COMMAND:
-            kphandset::kpstartupadmin_CommandParser(pScreen, wParam, (char*)dwParam);
-            returnVal = 1;
-            return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-        break;
-        case EVT_KPHANDSET_APP_NETWORK_CONNECTION_ERROR:
-            kpnetwork::SetServer(instance, instance->network.ipAddress, 1234);
-            if (pScreen->pavillion[0] != 120 || pScreen->pavillion[1] != 120)
-            {
-                pScreen->pavillion[1] = 120;
-                pScreen->pavillion[0] = 120;
-                kphandset::kpstartupadmin_ParseMission(pScreen, kphandset::kpstartupadmin_ReadFromAdminPath(instance, (char*)"admin", (char*)".txt"));
-            }
-            kphandset::kpstartupadmin_RefreshDisplay(pScreen, (char*)"Network Connection Error", 0);
-            kpnetwork::StartSocketPingTimer(instance, 0);
-            return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-        break;
-        case EVT_KPHANDSET_APP_NETWORK_WRITE_ERROR:
-            kphandset::kpstartupadmin_RefreshDisplay(pScreen, (char*)"Network Write Error", 0);
-            return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-        break;
-        case EVT_KPHANDSET_APP_NETWORK_READ_ERROR:
-            kphandset::kpstartupadmin_RefreshDisplay(pScreen, (char*)"Network Read Error", 0);
-            return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-        break;
-    }
-    if (eCode != EVT_KPHANDSET_APP_NETWORK_INCOMING_MESSAGE)
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-    int refreshDisplay = 1;
-    char* a2a = 0;
-    if (STRBEGINS("<reconnect", (const char*)dwParam + 2))
-    {
-        returnVal = 1;
-        char* ipBuf = kphandset::kphandset_ReadFromScratch((const char*)(dwParam + 2), "ip");
-        if (ipBuf && *ipBuf)
-        {
-            kpnetwork::SetServer(instance, ipBuf, 0);
-            kphandset::kpstartupadmin_ParseMission(pScreen, kphandset::kpstartupadmin_ReadFromAdminPath(instance, pScreen->pavillion, (char*)".txt"));
-        }
-        kpnetwork::StartSocketPingTimer(instance, 0);
-        if (a2a && *a2a)
-            kphandset::kpstartupadmin_RefreshDisplay(pScreen, a2a, refreshDisplay);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-    }
-    if (!STRBEGINS("<state", (const char*)dwParam + 2) && !STRBEGINS("<admin", (const char*)dwParam + 2))
-    {
-        a2a = (char*)(dwParam + 2);
-        if (a2a && *a2a)
-            kphandset::kpstartupadmin_RefreshDisplay(pScreen, a2a, refreshDisplay);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-    }
-    returnVal = 1;
-    a2a = kphandset::kphandset_ReadFromScratch((const char*)dwParam + 2, "value");
-    if (a2a && STRBEGINS("error", a2a))
-    {
-        a2a = kphandset::kphandset_ReadFromScratch((const char*)dwParam + 2, "error");
-        refreshDisplay = 0;
-        kpnetwork::StartSocketPingTimer(instance, 0);
-    }
-    else if (a2a && STRBEGINS("gagComplete", a2a) || a2a && STRBEGINS("ok", a2a))
-    {
-        kpnetwork::StartSocketPingTimer(instance, 0);
-    }
-    if (a2a && *a2a)
-        kphandset::kpstartupadmin_RefreshDisplay(pScreen, a2a, refreshDisplay);
-    return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
-}
-kpstartup_admin* kphandset::kpstartupadmin_initialize(kphandset* pApp)
-{
-    kpstartup_admin* startup = (kpstartup_admin*)kphandset::FetchScreen(pApp);
-    if (startup)
-    {
-        int a;
-        int d;
-        AEERect rect;
-        kphandset::kpscreen_Initialize(startup);
-        startup->InitPtr = (void (*)(kpscreen*, int))kphandset::kpstartupadmin_Init;
-        startup->DrawPtr = (void (*)(kpscreen*))kphandset::kpstartupadmin_Draw;
-        startup->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kphandset::kpstartupadmin_HandleEvent;
-        startup->ReleasePtr = (void (*)(kpscreen*))kphandset::kpstartupadmin_Release;
-        startup->pavillion[1] = 120;
-        startup->pavillion[0] = 120;
-        startup->kpstartupAdmin_unk2_2 = 1;
-        IDISPLAY_GetFontMetrics(pApp->m_pIDisplay, AEE_FONT_USER_1, &a, &d);
-        rect.x = 0;
-        rect.y = 0;
-        rect.dx = pApp->pBitmapInfo.cx;
-        rect.dy = 2 * (a + d);
-        if (!ISHELL_CreateInstance(pApp->m_pIShell, AEECLSID_STATIC, (void**)&startup->pHandsetID))
-        {
-            ISTATIC_SetRect(startup->pHandsetID, &rect);
-            ISTATIC_SetFont(startup->pHandsetID, AEE_FONT_USER_1, AEE_FONT_USER_1);
-            ISTATIC_SetProperties(startup->pHandsetID, ST_ASCII | ST_CENTERTEXT);
-        }
-        rect.y += rect.dy;
-        rect.dy = pApp->pBitmapInfo.cy - rect.y;
-        if (!ISHELL_CreateInstance(pApp->m_pIShell, AEECLSID_MENUCTL, (void**)&startup->pMenuCtl))
-        {
-            AEEItemStyle pNormal, pSel;
-            IMENUCTL_SetRect(startup->pMenuCtl, &rect);
-            IMENUCTL_GetStyle(startup->pMenuCtl, &pNormal, &pSel);
-            pNormal.ft = AEE_FT_NONE;
-            pNormal.xOffset = 0;
-            pSel.ft = AEE_FT_RAISED;
-            pSel.xOffset = 1;
-            IMENUCTL_SetStyle(startup->pMenuCtl, &pNormal, &pSel);
-        }
-        char* AdminPath = kphandset::kpstartupadmin_ReadFromAdminPath(pApp, (char*)"admin", (char*)".txt");
-        kphandset::kpstartupadmin_ParseMission(startup, AdminPath);
-    }
-    return startup;
-}
-
-void kphandset::kpstartupadmin_CreateOutgoingMessage(kphandset* pApp, const char* message)
-{
-    kpnetwork::CreateOutgoingMessage(pApp, message, 0);
-}
-
-void kphandset::kpstartupadmin_CommandParser(kpstartup_admin* a1, int a2, char* a3)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    char* episode = STRCHREND(a3, 58);
-    if (*episode)
-        ++episode;
-    if (STRBEGINS("trigger:", a3))
-    {
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' value='connect' />", instance->handsetID);
-        kphandset::kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' gag='%s' value='trigger' />", instance->handsetID, "UNK");
-        kphandset::kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' value='disconnect' />", instance->handsetID);
-        kphandset::kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "Sending Trigger:\n%s", episode);
-        kphandset::kpstartupadmin_RefreshDisplay(a1, instance->scratch, 1);
-        kpnetwork::StartSocketPingTimer(instance, 5000);
-    }
-    if (STRBEGINS("mode:", a3))
-    {
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' value='connect' />", instance->handsetID);
-        kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' mode='%s' value='trigger' />", instance->handsetID, "UNK");
-        kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' value='disconnect' />", instance->handsetID);
-        kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        SNPRINTF(instance->scratch, 400u, "Sending Mode:\n%s", episode);
-        kpstartupadmin_RefreshDisplay(a1, instance->scratch, 1);
-        kpnetwork::StartSocketPingTimer(instance, 5000);
-    }
-    else if (STRBEGINS("episode:", a3))
-    {
-        kpnetwork::SetServer(instance, instance->network.ipAddress, 1234);
-        SNPRINTF(instance->scratch, 400u, "<admin handset='%s' episode='%s' />", instance->handsetID, episode);
-        kphandset::kpstartupadmin_CreateOutgoingMessage(instance, instance->scratch);
-        *(char*)a1->pavillion = *(char*)episode;
-        if (a1->pMenuCtl)
-            a1->pMenuCtl->pvt->DeleteAll(a1->pMenuCtl);
-        SNPRINTF(instance->scratch, 400u, "Connecting to Game Server\nEpisode: '%s'", episode);
-        kphandset::kpstartupadmin_RefreshDisplay(a1, instance->scratch, 1);
-        kpnetwork::StartSocketPingTimer(instance, 5000);
-    }
-    else if (STRBEGINS("menu:", a3))
-    {
-        char* menuFile = kphandset::kpstartupadmin_ReadFromAdminPath(instance, episode, (char*)".txt");
-        kphandset::kpstartupadmin_ParseMission(a1, menuFile);
-        a1->pavillion[0] = 120;
-    }
-}
-
-void kphandset::kpstartupadmin_Draw(kpstartup_admin* pScreen)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    IDISPLAY_SetColor(instance->m_pIDisplay, CLR_USER_BACKGROUND, 0xFFFFFFFF);
-    if (pScreen->pMenuCtl)
-        IMENUCTL_Redraw(pScreen->pMenuCtl);
-    if (pScreen->kpstartupAdmin_unk2_2)
-        IDISPLAY_SetColor(instance->m_pIDisplay, CLR_USER_BACKGROUND, 0xFFFFFFFF);
-    else
-        IDISPLAY_SetColor(instance->m_pIDisplay, CLR_USER_BACKGROUND, 0x8080E0FF);
-    if (pScreen->pHandsetID)
-        ISTATIC_Redraw(pScreen->pHandsetID);
-    IDISPLAY_SetColor(instance->m_pIDisplay, CLR_USER_BACKGROUND, 0xFFFFFFFF);
-    kphandset::kpscreen_Draw(pScreen);
-}
-
-void kphandset::kpstartupadmin_Release(kpstartup_admin* pScreen)
-{
-    if (pScreen->pHandsetID)
-    {
-        ISTATIC_Release(pScreen->pHandsetID);
-        pScreen->pHandsetID = 0;
-    }
-    if (pScreen->pMenuCtl)
-    {
-        IMENUCTL_Release(pScreen->pMenuCtl);
-        pScreen->pMenuCtl = 0;
-    }
-    if (pScreen->pNotice)
-    {
-        FREE(pScreen->pNotice);
-        pScreen->pNotice = 0;
-    }
-    kphandset::kpscreen_Release(pScreen);
-}
-
-void kphandset::kpstartupadmin_ParseMission(kpstartup_admin* a1, const char* path)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    if (a1->pMenuCtl)
-    {
-        if (a1->pNotice)
-        {
-            FREE(a1->pNotice);
-            a1->pNotice = 0;
-        }
-        IMENUCTL_DeleteAll(a1->pMenuCtl);
-        a1->pNotice = kphelpers::LoadStringFromFile(instance, path, 0, 0);
-        uint16 itemIndex = 0;
-        char* pNotice = a1->pNotice;
-        while (pNotice && *pNotice)
-        {
-            while (*pNotice && kphandset::kp_CheckToken((unsigned char)*pNotice))
-                ++pNotice;
-            char* noticeBuf = pNotice;
-            while (*pNotice && *pNotice != 13 && *pNotice != 10)
-                ++pNotice;
-            if (*pNotice)
-                *pNotice++ = 0;
-            if (*noticeBuf != 35 && *noticeBuf)
-            {
-                if (STRBEGINS("title:", noticeBuf))
-                {
-                    kphandset::kpstartupadmin_RefreshDisplay(a1, noticeBuf + 6, 1);
-                }
-                else
-                {
-                    uint32 noticeVal = (uint32)noticeBuf;
-                    while (*noticeBuf && !kphandset::kp_CheckToken((unsigned char)*noticeBuf))
-                        ++noticeBuf;
-                    if (*noticeBuf)
-                        *noticeBuf++ = 0;
-                    while (*noticeBuf && kphandset::kp_CheckToken((unsigned char)*noticeBuf))
-                        ++noticeBuf;
-                    ++itemIndex;
-                    STRTOWSTR(noticeBuf, (AECHAR*)instance->scratch, 400);
-                    IMENUCTL_AddItem(a1->pMenuCtl,NULL,0,itemIndex, (AECHAR*)instance->scratch, noticeVal);
-                }
-            }
-        }
-        kpnetwork::StartSocketPingTimer(instance, 0);
-        kphandset::kpscreen_RefreshDisplay(instance);
-    }
-}
-
-char* kphandset::kpstartupadmin_ReadFromAdminPath(kphandset* pApp, char* file, char* extension)
-{
-    char* scratch = pApp->scratch;
-    if (file == pApp->scratch)
-        scratch = pApp->kphandset_unk154;
-    SNPRINTF(scratch, 400u, "fs:/card0/admin/%s%s", file, extension);
-    return scratch;
-}
-
-void kphandset::kpstartupadmin_Init(kpstartup_admin* pScreen, int a2)
-{
-    if (pScreen->pHandsetID)
-        ISTATIC_SetActive(pScreen->pHandsetID, a2);
-    if (pScreen->pMenuCtl)
-        IMENUCTL_SetActive(pScreen->pMenuCtl, a2);
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    if (a2 == 1)
-        instance->network.keepalive = 10000;
-    else
-        instance->network.keepalive = instance->network.default_keepalive;
-    if(a2 == 1)
-        kptimeout::ClearTimeout(instance);
-}
-
-void kphandset::kpstartupadmin_RefreshDisplay(kpstartup_admin* a1, char* a2, char a3)
-{
-    if (a1->pHandsetID)
-    {
-        a1->kpstartupAdmin_unk2_2 = a3;
-        ISTATIC_SetText(a1->pHandsetID, 0, (AECHAR*)a2, AEE_FONT_USER_1, AEE_FONT_USER_1);
-        kphandset::kpscreen_RefreshDisplay((kphandset*)GETAPPINSTANCE());
-    }
 }
 //
 

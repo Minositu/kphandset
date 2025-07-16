@@ -169,7 +169,7 @@ bool kpstill::HandleEvent(kpstill* pScreen, AEEEvent eCode, uint16 wParam, uint3
         }
         handled = 1;
     }
-    return handled || kphandset::kpscreen_HandleEvent((kpstartup_client*)pScreen, eCode, wParam, dwParam);
+    return handled || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
 }
 
 void kpstill::Draw(kpstill* pScreen)
@@ -200,7 +200,7 @@ void kpstill::Draw(kpstill* pScreen)
     }
     if (!pScreen->retrigger_buffer[0] && pScreen->replay_enabled && instance->ui_replay_Interface)
         IIMAGE_Draw(instance->ui_replay_Interface, 0, 0);
-    kphandset::kpscreen_Draw((kpstartup_client*)pScreen);
+    kphandset::kpscreen_Draw(pScreen);
 }
 
 void kpstill::Release(kpstill* pScreen)

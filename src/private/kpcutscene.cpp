@@ -82,7 +82,7 @@ kpscreen* kpcutscene::ExecuteCommand(kphandset* pApp, char* commandBuffer)
         }
         else
         {
-            kphandset::kpscreen_Release((kpstartup_client*)pScreen);
+            kphandset::kpscreen_Release(pScreen);
             return 0;
         }
     }

@@ -131,38 +131,6 @@ public:
 	uint8 kpstartup_unk11_1;
 };
 
-class kpstartup_client : public kpscreen
-{
-public:
-	IImage* kpstartup_client_unk1;
-	IStatic* pHandsetID;
-	IStatic* pVersion;
-	IStatic* pNotice;
-};
-
-class kpstartup_admin : public kpscreen
-{
-public:
-	char pavillion[2];
-	uint8 kpstartupAdmin_unk2_1;
-	uint8 kpstartupAdmin_unk2_2;
-	IStatic* pHandsetID;
-	IMenuCtl* pMenuCtl;
-	char* pNotice;
-};
-
-class kpscreen_enter : public kpscreen
-{
-public:
-
-};
-
-class kpscreen_endgame : public kpscreen
-{
-public:
-
-};
-
 class kphandset : public AEEApplet {
 public:
 	//Interface
@@ -177,7 +145,6 @@ public:
 	static int CheckLowBattery(kphandset* pApp);
 	static char* InitScriptMgr(kphandset* pApp);
 	static int func_28178(kphandset* a1);
-	static kpstartup_client* kpstartupclient_initialize(kphandset* a1);
 	static bool kp_CheckToken(int a1);
 	static void InitFonts(kphandset* a1);
 	static void kpsys_PreloadUIImages(kphandset* pApp);
@@ -234,30 +201,6 @@ public:
 	static void kpscreen_Release(kpscreen* a1);
 	static bool kpscreen_HandleEvent(kpscreen* a1, AEEEvent eCode, uint16 wParam, uint32 dwParam);
 	static void kpscreen_Initialize(kpscreen* pScreen);
-
-	//kpscreen_client
-	static void kpstartupclient_Init(kpstartup_client* a1, int a2);
-	static void kpstartupclient_Draw(kpstartup_client* pScreen);
-	static bool kpstartupclient_HandleEvent(kpstartup_client* a1, AEEEvent eCode, uint16 wParam, uint32 dwParam);
-	static void kpstartupclient_Release(kpstartup_client* a1);
-
-	//kpscreen_admin
-	static bool kpstartupadmin_HandleEvent(kpstartup_admin* a1, AEEEvent eCode, uint16 wParam, uint32 dwParam);
-	static kpstartup_admin* kpstartupadmin_initialize(kphandset* pApp);
-	static void kpstartupadmin_CreateOutgoingMessage(kphandset* pApp, const char* message);
-	static void kpstartupadmin_CommandParser(kpstartup_admin* a1, int a2, char* a3);
-	static void kpstartupadmin_Draw(kpstartup_admin* pScreen);
-	static void kpstartupadmin_Release(kpstartup_admin* a1);
-	static void kpstartupadmin_ParseMission(kpstartup_admin* a1, const char* path);
-	static char* kpstartupadmin_ReadFromAdminPath(kphandset* pApp, char* file, char* extension);
-	static void kpstartupadmin_Init(kpstartup_admin* a1, int a2);
-	static void kpstartupadmin_RefreshDisplay(kpstartup_admin* a1, char* a2, char a3);
-	//
-
-	//kpscreen_enter
-	//
-
-	//kpscreen_endgame
 
 	// implementation
 	IFileMgr* pFileMgr;
