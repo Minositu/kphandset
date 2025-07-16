@@ -1,10 +1,11 @@
+#include <AEENet.h>
+
 #include "kpnetwork.h"
 #include "kphandset.h"
 #include "kphelpers.h"
 #include "kpdebug.h"
 #include "kpupdate.h"
 #include "kptimeout.h"
-#include "AEENet.h"
 
 void kpnetwork::InitNetMgr(kphandset* pApp)
 {
@@ -406,7 +407,7 @@ void kpnetwork::ParseIncomingMessage(kphandset* pApp, const char* message)
 		if (url && *url)
 		{
 			kpscreen* updated = (kpscreen*)kpupdate::InitializeUpdateScreen(pApp, url);
-			kphandset::kpscreen_FetchSelectedScreen(pApp, updated);
+			kpscreen::FetchSelectedScreen(pApp, updated);
 		}
 	}
 	else if (STRIBEGINS("<broadcast", message))

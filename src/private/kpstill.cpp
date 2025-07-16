@@ -9,7 +9,7 @@ kpscreen* kpstill::ExecuteCommand(kphandset* pApp, char* commandBuffer, char* ui
     kpstill* pScreen = (kpstill*)kphandset::FetchScreen(pApp);
     if (pScreen)
     {
-        kphandset::kpscreen_Initialize(pScreen);
+        kpscreen::ExecuteCommand(pScreen);
         pScreen->InitPtr = (void (*)(kpscreen*, int))kpstill::Init;
         pScreen->DrawPtr = (void (*)(kpscreen*))kpstill::Draw;
         pScreen->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpstill::HandleEvent;
@@ -129,7 +129,7 @@ kpscreen* kpstill::ExecuteCommand(kphandset* pApp, char* commandBuffer, char* ui
 void kpstill::RefreshDisplay(kpstill* pScreen)
 {
     kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    kphandset::kpscreen_RefreshDisplay(instance);
+    kpscreen::RefreshDisplay(instance);
     ISHELL_SetTimer(instance->m_pIShell, 100, (PFNNOTIFY)kpstill::RefreshDisplay, pScreen);
 }
 
@@ -169,7 +169,7 @@ bool kpstill::HandleEvent(kpstill* pScreen, AEEEvent eCode, uint16 wParam, uint3
         }
         handled = 1;
     }
-    return handled || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+    return handled || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
 }
 
 void kpstill::Draw(kpstill* pScreen)
@@ -200,7 +200,7 @@ void kpstill::Draw(kpstill* pScreen)
     }
     if (!pScreen->retrigger_buffer[0] && pScreen->replay_enabled && instance->ui_replay_Interface)
         IIMAGE_Draw(instance->ui_replay_Interface, 0, 0);
-    kphandset::kpscreen_Draw(pScreen);
+    kpscreen::Draw(pScreen);
 }
 
 void kpstill::Release(kpstill* pScreen)
@@ -212,7 +212,7 @@ void kpstill::Release(kpstill* pScreen)
         IIMAGE_Release(pScreen->still_Image);
         pScreen->still_Image = 0;
     }
-    kphandset::kpscreen_Release(pScreen);
+    kpscreen::Release(pScreen);
 }
 
 void kpstill::Init(kpstill* pScreen, int initialize)

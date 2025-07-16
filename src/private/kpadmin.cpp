@@ -10,7 +10,7 @@ kpscreen* kpadmin::ExecuteCommand(kphandset* pApp)
         int a;
         int d;
         AEERect rect;
-        kphandset::kpscreen_Initialize(startup);
+        kpscreen::ExecuteCommand(startup);
         startup->InitPtr = (void (*)(kpscreen*, int))kpadmin::Init;
         startup->DrawPtr = (void (*)(kpscreen*))kpadmin::Draw;
         startup->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpadmin::HandleEvent;
@@ -148,7 +148,7 @@ void kpadmin::ParseMenu(kpadmin* pScreen, const char* path)
             }
         }
         kpnetwork::StartSocketPingTimer(instance, 0);
-        kphandset::kpscreen_RefreshDisplay(instance);
+        kpscreen::RefreshDisplay(instance);
     }
 }
 
@@ -158,7 +158,7 @@ void kpadmin::RefreshDisplay(kpadmin* pScreen, char* pText, char a3)
     {
         pScreen->kpstartupAdmin_unk2_2 = a3;
         ISTATIC_SetText(pScreen->pHandsetID, 0, (AECHAR*)pText, AEE_FONT_USER_1, AEE_FONT_USER_1);
-        kphandset::kpscreen_RefreshDisplay((kphandset*)GETAPPINSTANCE());
+        kpscreen::RefreshDisplay((kphandset*)GETAPPINSTANCE());
     }
 }
 
@@ -175,7 +175,7 @@ bool kpadmin::HandleEvent(kpadmin* pScreen, AEEEvent eCode, uint16 wParam, uint3
     case EVT_COMMAND:
         kpadmin::CommandParser(pScreen, wParam, (char*)dwParam);
         returnVal = 1;
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
         break;
     case EVT_KPHANDSET_APP_NETWORK_CONNECTION_ERROR:
         kpnetwork::SetServer(instance, instance->network.ipAddress, 1234);
@@ -187,19 +187,19 @@ bool kpadmin::HandleEvent(kpadmin* pScreen, AEEEvent eCode, uint16 wParam, uint3
         }
         kpadmin::RefreshDisplay(pScreen, (char*)"Network Connection Error", 0);
         kpnetwork::StartSocketPingTimer(instance, 0);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
         break;
     case EVT_KPHANDSET_APP_NETWORK_WRITE_ERROR:
         kpadmin::RefreshDisplay(pScreen, (char*)"Network Write Error", 0);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
         break;
     case EVT_KPHANDSET_APP_NETWORK_READ_ERROR:
         kpadmin::RefreshDisplay(pScreen, (char*)"Network Read Error", 0);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
         break;
     }
     if (eCode != EVT_KPHANDSET_APP_NETWORK_INCOMING_MESSAGE)
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
     int refreshDisplay = 1;
     char* a2a = 0;
     if (STRBEGINS("<reconnect", (const char*)dwParam + 2))
@@ -214,14 +214,14 @@ bool kpadmin::HandleEvent(kpadmin* pScreen, AEEEvent eCode, uint16 wParam, uint3
         kpnetwork::StartSocketPingTimer(instance, 0);
         if (a2a && *a2a)
             kpadmin::RefreshDisplay(pScreen, a2a, refreshDisplay);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
     }
     if (!STRBEGINS("<state", (const char*)dwParam + 2) && !STRBEGINS("<admin", (const char*)dwParam + 2))
     {
         a2a = (char*)(dwParam + 2);
         if (a2a && *a2a)
             kpadmin::RefreshDisplay(pScreen, a2a, refreshDisplay);
-        return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
     }
     returnVal = 1;
     a2a = kphandset::kphandset_ReadFromScratch((const char*)dwParam + 2, "value");
@@ -237,7 +237,7 @@ bool kpadmin::HandleEvent(kpadmin* pScreen, AEEEvent eCode, uint16 wParam, uint3
     }
     if (a2a && *a2a)
         kpadmin::RefreshDisplay(pScreen, a2a, refreshDisplay);
-    return returnVal || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+    return returnVal || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
 }
 
 void kpadmin::Draw(kpadmin* pScreen)
@@ -253,7 +253,7 @@ void kpadmin::Draw(kpadmin* pScreen)
     if (pScreen->pHandsetID)
         ISTATIC_Redraw(pScreen->pHandsetID);
     IDISPLAY_SetColor(instance->m_pIDisplay, CLR_USER_BACKGROUND, 0xFFFFFFFF);
-    kphandset::kpscreen_Draw(pScreen);
+    kpscreen::Draw(pScreen);
 }
 
 void kpadmin::Release(kpadmin* pScreen)
@@ -273,7 +273,7 @@ void kpadmin::Release(kpadmin* pScreen)
         FREE(pScreen->pNotice);
         pScreen->pNotice = 0;
     }
-    kphandset::kpscreen_Release(pScreen);
+    kpscreen::Release(pScreen);
 }
 
 void kpadmin::Init(kpadmin* pScreen, int initialize)

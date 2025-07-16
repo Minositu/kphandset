@@ -8,7 +8,7 @@ kpscreen* kpcutscene::ExecuteCommand(kphandset* pApp, char* commandBuffer)
     kpcutscene* pScreen = (kpcutscene*)kphandset::FetchScreen(pApp);
     if (pScreen)
     {
-        kphandset::kpscreen_Initialize(pScreen);
+        kpscreen::ExecuteCommand(pScreen);
         pScreen->InitPtr = (void (*)(kpscreen*, int))kpcutscene::Init;
         pScreen->DrawPtr = (void (*)(kpscreen*))kpcutscene::Draw;
         pScreen->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpcutscene::HandleEvent;
@@ -82,7 +82,7 @@ kpscreen* kpcutscene::ExecuteCommand(kphandset* pApp, char* commandBuffer)
         }
         else
         {
-            kphandset::kpscreen_Release(pScreen);
+            kpscreen::Release(pScreen);
             return 0;
         }
     }
@@ -230,7 +230,7 @@ void kpcutscene::UpdateFrame(kpcutscene* pScreen)
             kphandset::kpscr_func_1DDAC(pScreen);
         }
         if (kpcutscene::SubtitleHandler(pScreen) || pScreen->currentFilmstrip.filmstripIndex != filmstripIndex)
-            kphandset::kpscreen_RefreshDisplay(instance);
+            kpscreen::RefreshDisplay(instance);
     }
 }
 
@@ -328,7 +328,7 @@ bool kpcutscene::HandleEvent(kpcutscene* pScreen, AEEEvent eCode, uint16 wParam,
         {
             kpcutscene::LoadCutscene((kpcutscene*)dwParam);
         }
-        return kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+        return kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
     }
 }
 
@@ -352,7 +352,7 @@ void kpcutscene::Draw(kpcutscene* pScreen)
         kphandset* instance = (kphandset*)GETAPPINSTANCE();
         kphandset::kpscr_RenderSubtitles(&instance->global_bottom);
     }
-    kphandset::kpscreen_Draw(pScreen);
+    kpscreen::Draw(pScreen);
 }
 
 void kpcutscene::Release(kpcutscene* pScreen)
@@ -367,7 +367,7 @@ void kpcutscene::Release(kpcutscene* pScreen)
             pScreen->filmstripImages[i] = 0;
         }
     }
-    kphandset::kpscreen_Release(pScreen);
+    kpscreen::Release(pScreen);
 }
 
 void kpcutscene::Init(kpcutscene* pScreen, int initialize)

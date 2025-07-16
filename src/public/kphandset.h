@@ -1,27 +1,28 @@
 #ifndef __KPHANDSET_H__
 #define __KPHANDSET_H__
 
-#include "AEEAppGen.h"
-#include "AEEShell.h"
-#include "AEETAPI.h"
-#include "AEETelephone.h"
-#include "AEEFile.h"
-#include "AEEBacklight.h"
-#include "AEEGraphics.h"
-#include "AEENetwork.h"
-#include "AEEBattery.h"
-#include "AEEStdLib.h"
-#include "AEEMenu.h"
-#include "kpnetwork.h"
-#include "kpaudio.h"
-#include "AEEFontsStandard.BiD"
+#include <AEEAppGen.h>
+#include <AEEShell.h>
+#include <AEETAPI.h>
+#include <AEETelephone.h>
+#include <AEEFile.h>
+#include <AEEBacklight.h>
+#include <AEEGraphics.h>
+#include <AEENetwork.h>
+#include <AEEBattery.h>
+#include <AEEStdLib.h>
+#include <AEEMenu.h>
+#include <AEEFontsStandard.BiD>
 
 //BTFE
-#include "AEETypeface.h"
-#include "bid\AEECLSID_TYPEFACE.bid"
-#include "bid\AEECLSID_BTFEFONTBIDIUTIL.bid"
+#include <AEETypeface.h>
+#include <bid\AEECLSID_TYPEFACE.bid>
+#include <bid\AEECLSID_BTFEFONTBIDIUTIL.bid>
 //
 
+#include "kpnetwork.h"
+#include "kpscreen.h"
+#include "kpaudio.h"
 #include "kphandset.BiD"
 
 class kphelpers;
@@ -117,92 +118,8 @@ struct kpBottom
 	uint16 textFont;
 };
 
-
-class kpscreen
-{
-public:
-	void (*InitPtr)(kpscreen*, int a2);
-	void (*DrawPtr)(kpscreen*);
-	bool (*HandleEventPtr)(kpscreen*, AEEEvent eCode, uint16 wParam, uint32 dwParam);
-	void (*ReleasePtr)(kpscreen*);
-
-	char help_buffer[20];
-	char retrigger_buffer[20];
-	uint8 kpstartup_unk11_1;
-};
-
 class kphandset : public AEEApplet {
 public:
-	//Interface
-	static boolean Init(kphandset* pApp);
-	static void FreeAppData(AEEApplet* pMe);
-
-	//Unknown where these functions go
-	static int DisplayMessageBox(kphandset* pApp, const char* messageText);
-	static bool SDCheck(kphandset* pApp);
-	static void StartingApp(kphandset* pApp);
-	static void Sys_Init(kphandset* pApp);
-	static int CheckLowBattery(kphandset* pApp);
-	static char* InitScriptMgr(kphandset* pApp);
-	static int func_28178(kphandset* a1);
-	static bool kp_CheckToken(int a1);
-	static void InitFonts(kphandset* a1);
-	static void kpsys_PreloadUIImages(kphandset* pApp);
-	static void func_1C9EC(kphandset* a1);
-	static void kpscreen_FetchSelectedScreen(kphandset* pApp, kpscreen* a2);
-	static void kpscreen_RefreshDisplay(kphandset* a1);
-	static void* FetchScreen(kphandset* a1);
-	static void kpscr_func_1DDAC(kpscreen* a1);
-	static void kp_func_2A334(kpscreen* a1);
-	static void kpscript_Free(kphandset* pApp);
-	//
-
-	//Sys
-	static void kpsys_SetLanguage(kphandset* pApp, const char* language);
-	static void kpsys_SetPavilion(kphandset* pApp, const char* pavilion);
-	static void kpsys_LoadScript(kphandset* pApp, char* script);
-	static void kpsys_ClearScript(kphandset* pApp);
-	static void kpsys_ReadScript(kphandset* pApp, const char* script);
-	static void kpscr_ParseScript(kphandset* pApp);
-	static bool kpscr_Command_Goto(kphandset* pApp, const char* script);
-	static const char* kpscr_GetCommand(char* tokenizer);
-	static bool kpscr_func_310B8(char* a1);
-	static void kpsys_PickRandomSong(kphandset* pApp);
-	static void kpscr_func_2AB8C(kphandset* pApp);
-	static void kpscr_func_23C18(kphandset* pApp);
-	//
-
-	//Commands
-	static void kpscr_RenderSubtitles(kpBottom* a1);
-	static void kpscr_InitBottomBar(kpBottom* a1, const char* a2, const char* a3);
-	static void kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2);
-	static bool kpscr_Tokenizer(int a1);
-	static void kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip);
-	static void kpscr_Command_Vibrate(kphandset* a1, char* a2);
-	static void kpscr_Command_Message(kphandset* a1, char* a2);
-	static void kpscr_Command_Mark(kphandset* pApp);
-	static void kpscr_Command_Reboot(kphandset* pApp);
-	static void kpscr_Command_Return(kphandset* pApp);
-	static void kpscr_Command_SetReset(kphandset* pApp, char* a2, char isSet);
-	//
-
-	//Translation Mgr
-	static void kp_InitTranslatorMgr_func_27AD8(kphandset* pApp);
-	static void LoadStringTranslation(kphandset* pApp, const char* path);
-	static void kptranslator_Free(kphandset* pApp);
-	//
-
-	static char* kphandset_ReadFromScratch(const char* haystack, const char* needle);
-
-	//kpscreen core
-	static void kpscreen_ClearStartup(kphandset* pApp, void* a2);
-	static void kpscreen_Init(kpscreen* pScreen, int a2);
-	static void kpscreen_Draw(kpscreen* pScreen);
-	static void kpscreen_Release(kpscreen* a1);
-	static bool kpscreen_HandleEvent(kpscreen* a1, AEEEvent eCode, uint16 wParam, uint32 dwParam);
-	static void kpscreen_Initialize(kpscreen* pScreen);
-
-	// implementation
 	IFileMgr* pFileMgr;
 	IBacklight* pBacklight;
 	IGraphics* pGraphics;
@@ -258,6 +175,65 @@ public:
 	int global_two;
 	int global_alert_count;
 	uint32 timeSeconds;
+
+	//Interface
+	static boolean Init(kphandset* pApp);
+	static void FreeAppData(AEEApplet* pMe);
+
+	//Unknown where these functions go
+	static int DisplayMessageBox(kphandset* pApp, const char* messageText);
+	static bool SDCheck(kphandset* pApp);
+	static void StartingApp(kphandset* pApp);
+	static void Sys_Init(kphandset* pApp);
+	static int CheckLowBattery(kphandset* pApp);
+	static char* InitScriptMgr(kphandset* pApp);
+	static int func_28178(kphandset* a1);
+	static bool kp_CheckToken(int a1);
+	static void InitFonts(kphandset* a1);
+	static void kpsys_PreloadUIImages(kphandset* pApp);
+	static void func_1C9EC(kphandset* a1);
+	static void* FetchScreen(kphandset* a1);
+	static void kpscr_func_1DDAC(kpscreen* a1);
+	static void kp_func_2A334(kpscreen* a1);
+	static void kpscript_Free(kphandset* pApp);
+	//
+
+	//Sys
+	static void kpsys_SetLanguage(kphandset* pApp, const char* language);
+	static void kpsys_SetPavilion(kphandset* pApp, const char* pavilion);
+	static void kpsys_LoadScript(kphandset* pApp, char* script);
+	static void kpsys_ClearScript(kphandset* pApp);
+	static void kpsys_ReadScript(kphandset* pApp, const char* script);
+	static void kpscr_ParseScript(kphandset* pApp);
+	static bool kpscr_Command_Goto(kphandset* pApp, const char* script);
+	static const char* kpscr_GetCommand(char* tokenizer);
+	static bool kpscr_func_310B8(char* a1);
+	static void kpsys_PickRandomSong(kphandset* pApp);
+	static void kpscr_func_2AB8C(kphandset* pApp);
+	static void kpscr_func_23C18(kphandset* pApp);
+	//
+
+	//Commands
+	static void kpscr_RenderSubtitles(kpBottom* a1);
+	static void kpscr_InitBottomBar(kpBottom* a1, const char* a2, const char* a3);
+	static void kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2);
+	static bool kpscr_Tokenizer(int a1);
+	static void kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip);
+	static void kpscr_Command_Vibrate(kphandset* a1, char* a2);
+	static void kpscr_Command_Message(kphandset* a1, char* a2);
+	static void kpscr_Command_Mark(kphandset* pApp);
+	static void kpscr_Command_Reboot(kphandset* pApp);
+	static void kpscr_Command_Return(kphandset* pApp);
+	static void kpscr_Command_SetReset(kphandset* pApp, char* a2, char isSet);
+	//
+
+	//Translation Mgr
+	static void kp_InitTranslatorMgr_func_27AD8(kphandset* pApp);
+	static void LoadStringTranslation(kphandset* pApp, const char* path);
+	static void kptranslator_Free(kphandset* pApp);
+	//
+
+	static char* kphandset_ReadFromScratch(const char* haystack, const char* needle);
 };
 
 #endif

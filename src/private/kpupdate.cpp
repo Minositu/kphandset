@@ -241,7 +241,7 @@ void kpupdate::WebResponseCB(void* pData)
                         }
                         if (pUpdate->updatebuffer.bufferSize)
                             MEMMOVE(&pUpdate->updatebuffer.buffer[4], pUpdate->updatebuffer.buffer, pUpdate->updatebuffer.bufferSize);
-                        kphandset::kpscreen_RefreshDisplay(((kphandset*)GETAPPINSTANCE()));
+                        kpscreen::RefreshDisplay(((kphandset*)GETAPPINSTANCE()));
                     }
                 }
             }
@@ -289,7 +289,7 @@ kpupdate* kpupdate::InitializeUpdateScreen(kphandset* a1, const char* url)
     kpupdate* screen = (kpupdate*)kphandset::FetchScreen(a1);
     if (screen)
     {
-        kphandset::kpscreen_Initialize(screen);
+        kpscreen::ExecuteCommand(screen);
         screen->InitPtr = (void (*)(kpscreen*, int))kpupdate::Init;
         screen->DrawPtr = (void (*)(kpscreen*))kpupdate::Draw;
         screen->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpupdate::HandleEvent;
@@ -324,7 +324,7 @@ kpupdate* kpupdate::InitializeUpdateScreen(kphandset* a1, const char* url)
 
 bool kpupdate::HandleEvent(kpupdate* pScreen, AEEEvent eCode, uint16 wParam, uint32 dwParam)
 {
-    return kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+    return kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
 }
 
 void kpupdate::Draw(kpupdate* pScreen)
@@ -376,7 +376,7 @@ void kpupdate::Draw(kpupdate* pScreen)
         //IDISPLAY_DrawRect(instance->m_pIDisplay, &rect, -1, 0x80E080FF, IDF_RECT_FILL);
         IDISPLAY_DrawRect(instance->m_pIDisplay, &rect, -1, MAKE_RGB(128, 224, 128), IDF_RECT_FILL);
     }
-    kphandset::kpscreen_Draw(pScreen);
+    kpscreen::Draw(pScreen);
 }
 
 void kpupdate::Release(kpupdate* pScreen)
@@ -392,7 +392,7 @@ void kpupdate::Release(kpupdate* pScreen)
         ISTATIC_Release(pScreen->pUpdatingText);
         pScreen->pUpdatingText = 0;
     }
-    kphandset::kpscreen_Release(pScreen);
+    kpscreen::Release(pScreen);
 }
 
 void kpupdate::Init(kpupdate* pScreen, int initialize)

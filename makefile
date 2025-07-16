@@ -16,6 +16,7 @@ SRC_KPHANDSET = \
 	kphandset.o \
 	kphelpers.o \
 	kpnetwork.o \
+	kpscreen.o \
 	kpstill.o \
 	kptimeout.o \
 	kpupdate.o \

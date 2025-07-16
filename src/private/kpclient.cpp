@@ -9,7 +9,7 @@ kpscreen* kpclient::ExecuteCommand(kphandset* pApp)
     kpclient* client = (kpclient*)kphandset::FetchScreen(pApp);
     if (client)
     {
-        kphandset::kpscreen_Initialize(client);
+        kpscreen::ExecuteCommand(client);
         client->InitPtr = (void (*)(kpscreen*, int))kpclient::Init;
         client->DrawPtr = (void (*)(kpscreen*))kpclient::Draw;
         client->HandleEventPtr = (bool (*)(kpscreen*, AEEEvent, uint16, uint32))kpclient::HandleEvent;
@@ -64,7 +64,7 @@ bool kpclient::HandleEvent(kpclient* pScreen, AEEEvent eCode, uint16 wParam, uin
         if (instance->adminMode)
         {
             kpscreen* screen = kpadmin::ExecuteCommand(instance);
-            kphandset::kpscreen_FetchSelectedScreen(instance, screen);
+            kpscreen::FetchSelectedScreen(instance, screen);
         }
         else
         {
@@ -93,7 +93,7 @@ bool kpclient::HandleEvent(kpclient* pScreen, AEEEvent eCode, uint16 wParam, uin
             ISHELL_CancelTimer(instance->m_pIShell, (PFNNOTIFY)kpnetwork::Initialize, instance);
         }
     }
-    return initialized || kphandset::kpscreen_HandleEvent(pScreen, eCode, wParam, dwParam);
+    return initialized || kpscreen::HandleEvent(pScreen, eCode, wParam, dwParam);
 }
 
 void kpclient::Draw(kpclient* pScreen)
@@ -114,7 +114,7 @@ void kpclient::Draw(kpclient* pScreen)
         ISTATIC_Redraw(pScreen->pNotice);
     if (pScreen->pHandsetID)
         ISTATIC_Redraw(pScreen->pHandsetID);
-    kphandset::kpscreen_Draw(pScreen);
+    kpscreen::Draw(pScreen);
 }
 
 void kpclient::Release(kpclient* pScreen)
@@ -139,7 +139,7 @@ void kpclient::Release(kpclient* pScreen)
         ISTATIC_Release(pScreen->pVersion);
         pScreen->pVersion = 0;
     }
-    kphandset::kpscreen_Release(pScreen);
+    kpscreen::Release(pScreen);
 }
 
 void kpclient::Init(kpclient* pScreen, int initialize)

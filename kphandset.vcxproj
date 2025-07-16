@@ -160,6 +160,7 @@
     <ClCompile Include="src\private\kphandset.cpp" />
     <ClCompile Include="src\private\kphelpers.cpp" />
     <ClCompile Include="src\private\kpnetwork.cpp" />
+    <ClCompile Include="src\private\kpscreen.cpp" />
     <ClCompile Include="src\private\kpstill.cpp" />
     <ClCompile Include="src\private\kptimeout.cpp" />
     <ClCompile Include="src\private\kpupdate.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\public\kphandset.h" />
     <ClInclude Include="src\public\kphelpers.h" />
     <ClInclude Include="src\public\kpnetwork.h" />
+    <ClInclude Include="src\public\kpscreen.h" />
     <ClInclude Include="src\public\kpstill.h" />
     <ClInclude Include="src\public\kptimeout.h" />
     <ClInclude Include="src\public\kpupdate.h" />

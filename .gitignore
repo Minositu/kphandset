@@ -32,8 +32,10 @@
 *.app
 
 .vs/*
+.vscode/*
 Debug/*
 Release/*
+out/*
 clicker-cond-medium-sc.ttf
 
 _server.txt

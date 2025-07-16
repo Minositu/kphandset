@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __KPAUDIO_H__
+#define __KPAUDIO_H__
 
-#include "AEEMedia.h"
+#include <AEEMedia.h>
 
 class kpaudio {
 public:
@@ -36,3 +37,5 @@ public:
 	static void MediaTimer(kpaudio* pAudio);
 	static void MediaNotify(kphandset* pApp, AEEMediaCmdNotify* pCmdNotify);
 };
+
+#endif

@@ -70,7 +70,7 @@ INITIALIZATION AND SEQUENCING REQUIREMENTS:
 
 
 
-   	   Copyright © 2000-2002 QUALCOMM Incorporated.
+   	   Copyright ï¿½ 2000-2002 QUALCOMM Incorporated.
 	                  All Rights Reserved.
                    QUALCOMM Proprietary/GTDR
 ===========================================================================*/
@@ -79,9 +79,12 @@ INITIALIZATION AND SEQUENCING REQUIREMENTS:
 /*===============================================================================
 INCLUDES AND VARIABLE DEFINITIONS
 =============================================================================== */
-#include "AEEAppGen.h"        // Applet helper file
+#include <AEEAppGen.h>        // Applet helper file
+#include <AEETelephone.h>
+#include <AEESMS.h>
+#include <nmdef.h>
+
 #include "kphandset.bid"		// Applet-specific header that contains class ID
-#include "nmdef.h"
 #include "kphandset.h"
 #include "kpdebug.h"
 #include "kphelpers.h"
@@ -93,8 +96,6 @@ INCLUDES AND VARIABLE DEFINITIONS
 #include "kpstill.h"
 #include "kpwait.h"
 #include "kpclient.h"
-#include "AEETelephone.h"
-#include "AEESMS.h"
 
 /*-------------------------------------------------------------------
 Static function prototypes
@@ -604,7 +605,7 @@ void kphandset::Sys_Init(kphandset* pApp)
     if (pApp->adminMode)
     {
         kpscreen* screen = kpadmin::ExecuteCommand(pApp);
-        kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
+        kpscreen::FetchSelectedScreen(pApp, screen);
         FileInfo info;
         if (IFILEMGR_GetInfo(pApp->pFileMgr, "fs:/card0/jj", &info) != 1)
             ISHELL_SetTimer(pApp->m_pIShell, 10, (PFNNOTIFY)kphandset::kpsys_PickRandomSong, pApp);
@@ -612,7 +613,7 @@ void kphandset::Sys_Init(kphandset* pApp)
     else
     {
         kpscreen* screen = (kpscreen*)kpclient::ExecuteCommand(pApp);
-        kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
+        kpscreen::FetchSelectedScreen(pApp, screen);
     }
     ISHELL_RegisterNotify(pApp->m_pIShell, AEECLSID_KPHANDSET, AEECLSID_PHONENOTIFIER, AEET_NMASK_NEW_CALLDESC);
     ISHELL_RegisterNotify(pApp->m_pIShell, AEECLSID_KPHANDSET, AEECLSID_SMSNOTIFIER, NMASK_SMS_BROADCAST);
@@ -688,29 +689,6 @@ void* kphandset::FetchScreen(kphandset* pApp)
     return p_kpstartup2;
 }
 
-void kphandset::kpscreen_FetchSelectedScreen(kphandset* pApp, kpscreen* a2)
-{
-    if (pApp->pSelectedStartup != a2)
-    {
-        kpscreen* pSelectedStartup = pApp->pSelectedStartup;
-        if (pSelectedStartup)
-        {
-            pSelectedStartup->InitPtr(pSelectedStartup, 0);
-            pApp->pSelectedStartup = 0;
-            pSelectedStartup->ReleasePtr(pSelectedStartup);
-        }
-        pApp->pSelectedStartup = a2;
-        if (a2)
-            a2->InitPtr(a2, 1);
-        kphandset::kpscreen_RefreshDisplay(pApp);
-    }
-}
-void kphandset::kpscreen_RefreshDisplay(kphandset* a1)
-{
-    if (a1->pSelectedStartup)
-        a1->pSelectedStartup->DrawPtr(a1->pSelectedStartup);
-    IDISPLAY_Update(a1->m_pIDisplay);
-}
 void kphandset::StartingApp(kphandset* pApp)
 {
     kpdebug::Print((char*)"App Starting");
@@ -720,7 +698,7 @@ void kphandset::StartingApp(kphandset* pApp)
         if (!pApp->pSelectedStartup)
         {
             kpscreen* screen = (kpscreen*)kpclient::ExecuteCommand(pApp);
-            kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
+            kpscreen::FetchSelectedScreen(pApp, screen);
         }
     }
 }
@@ -1004,7 +982,7 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
         pApp->script.tokenizer = kphelpers::FetchSubToken(mainToken);
     }
     if (screen)
-        kphandset::kpscreen_FetchSelectedScreen(pApp, screen);
+        kpscreen::FetchSelectedScreen(pApp, screen);
 }
 
 bool kphandset::kpscr_Command_Goto(kphandset* pApp, const char* script)
@@ -1354,65 +1332,6 @@ char* kphandset::kphandset_ReadFromScratch(const char* haystack, const char* nee
         }
     }
     return scratch;
-}
-
-//kpscreen_core
-void kphandset::kpscreen_ClearStartup(kphandset* pApp, void* a2)
-{
-    if (a2 == &pApp->kpstartup1)
-    {
-        MEMSET(a2, 205, 4564);
-        pApp->kphandset_isStartup1 = 0;
-    }
-    else if (a2 == &pApp->kpstartup2)
-    {
-        MEMSET(a2, 205, 4564);
-        pApp->kphandset_isStartup2 = 0;
-    }
-}
-void kphandset::kpscreen_Init(kpscreen* pScreenint, int a2)
-{
-    //Intentionally left empty
-}
-void kphandset::kpscreen_Draw(kpscreen* pScreen)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    if (pScreen->help_buffer[0] && instance->ui_help_Interface)
-        IMODULE_CreateInstance((IModule*)instance->ui_help_Interface, 0, 0, 0);
-    if (pScreen->retrigger_buffer[0])
-    {
-        if (instance->ui_retrigger_Interface)
-            IMODULE_CreateInstance((IModule*)instance->ui_retrigger_Interface, 0, 0, 0);
-    }
-}
-void kphandset::kpscreen_Release(kpscreen* pScreen)
-{
-    kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    kphandset::kpscreen_ClearStartup(instance, pScreen);
-}
-bool kphandset::kpscreen_HandleEvent(kpscreen* pScreen, AEEEvent eCode, uint16 wParam, uint32 dwParam)
-{
-    if (eCode == EVT_KEY && wParam == AVK_SOFT2 && pScreen->help_buffer[0])
-    {
-        kphelpers::FetchGoToToken((kphandset*)GETAPPINSTANCE(), pScreen->help_buffer);
-        kphandset::kpscr_func_1DDAC(pScreen);
-    }
-    else if (eCode == EVT_KEY && wParam == AVK_SOFT1 && pScreen->retrigger_buffer[0])
-    {
-        kphelpers::FetchGoToToken((kphandset*)GETAPPINSTANCE(), pScreen->retrigger_buffer);
-        kphandset::kpscr_func_1DDAC(pScreen);
-    }
-    return 0;
-}
-void kphandset::kpscreen_Initialize(kpscreen* pScreen)
-{
-    pScreen->InitPtr = kphandset::kpscreen_Init;
-    pScreen->DrawPtr = kphandset::kpscreen_Draw;
-    pScreen->HandleEventPtr = kphandset::kpscreen_HandleEvent;
-    pScreen->ReleasePtr = kphandset::kpscreen_Release;
-    pScreen->help_buffer[0] = 0;
-    pScreen->retrigger_buffer[0] = 0;
-    pScreen->kpstartup_unk11_1 = 0;
 }
 //
 
