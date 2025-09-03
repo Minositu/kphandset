@@ -356,12 +356,12 @@ char* kphandset::InitScriptMgr(kphandset* pApp)
     }
     return result;
 }
-int kphandset::func_28178(kphandset* a1)
+int kphandset::RefreshBacklight(kphandset* pApp)
 {
-    if (a1->pBacklight)
-        IBACKLIGHT_SetBrightnessLevel(a1->pBacklight, -1);
-    IDISPLAY_Backlight(a1->m_pIDisplay, 1);
-    return ISHELL_SetTimer(a1->m_pIShell, 3000, (PFNNOTIFY)kphandset::func_28178, a1);
+    if (pApp->pBacklight)
+        IBACKLIGHT_SetBrightnessLevel(pApp->pBacklight, -1);
+    IDISPLAY_Backlight(pApp->m_pIDisplay, 1);
+    return ISHELL_SetTimer(pApp->m_pIShell, 3000, (PFNNOTIFY)kphandset::RefreshBacklight, pApp);
 }
 bool kphandset::kp_CheckToken(int a1)
 {
@@ -516,25 +516,25 @@ void kphandset::kpsys_PreloadUIImages(kphandset* pApp)
     pApp->ui_retrigger_Interface = kphelpers::LoadUIImages(pApp, (char*)"ui_retrigger");
     pApp->ui_waiting_Interface = kphelpers::LoadUIImages(pApp, (char*)"ui_waiting");
 }
-void kphandset::func_1C9EC(kphandset* a1)
+void kphandset::PrintRamUsage(kphandset* a1)
 {
     int pdwLargest = 0;
     uint32 pdwTotal = 0;
     uint32 ramFree = GETRAMFREE(&pdwTotal, (uint32*)&pdwLargest);
     unsigned int ramRemainingPercent = (100 * ramFree) / pdwTotal;
     kpdebug::AssertLine("*** RAM REMAINING: %lu pct", ramRemainingPercent);
-    //kpdebug_func_2776C((kphandset*)GETAPPINSTANCE(), "MEM: %lu/%lu (%lu)", ramFree, pdwTotal, pdwLargest);
+    //kpdebug::kpdebug_func_2776C((kphandset*)GETAPPINSTANCE(), "MEM: %lu/%lu (%lu)", ramFree, pdwTotal, pdwLargest);
     if (ramRemainingPercent < 7)
     {
         kpdebug::Print((char*)"*** FREE RAM BELOW 7 pct ***");
         //kphandset::kpscr_CheckFilmstripUpTime(a1);
-        //kpkhandset::kpmem_PrintMemUsage();
+        //kphandset::kpmem_PrintMemUsage();
     }
 }
 
 void kphandset::Sys_Init(kphandset* pApp)
 {
-    CALLBACK_Init(&pApp->pSystemCallback, kphandset::func_1C9EC, pApp);
+    CALLBACK_Init(&pApp->pSystemCallback, kphandset::PrintRamUsage, pApp);
     ISHELL_RegisterSystemCallback(pApp->m_pIShell, &pApp->pSystemCallback, 2);
     IBitmap* bitmap;
     IDISPLAY_GetDeviceBitmap(pApp->m_pIDisplay, &bitmap);
@@ -596,7 +596,7 @@ void kphandset::Sys_Init(kphandset* pApp)
     //kp_nullfunc_5(a1);
     pApp->kphandset_isStartup1 = 0;
     pApp->kphandset_isStartup2 = 0;
-    ISHELL_SetTimer(pApp->m_pIShell, 3000, (PFNNOTIFY)kphandset::func_28178, pApp);
+    ISHELL_SetTimer(pApp->m_pIShell, 3000, (PFNNOTIFY)kphandset::RefreshBacklight, pApp);
     kpdebug::Print((char*)"SYS: Initializing fonts");
     kphandset::InitFonts(pApp);
     kpdebug::Print((char*)"SYS: Fonts initialized");
@@ -802,7 +802,7 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
     while (pApp->script.pLabel[0] && pApp->script.tokenizer && *pApp->script.tokenizer && *pApp->script.tokenizer != 58 && !screen)
     {
         char* tokenizer = pApp->script.tokenizer;
-        kphelpers::ParseTokenizer(pApp->kphandset_unk99, tokenizer);
+        kphelpers::ParseTokenizer(pApp->scriptBuf, tokenizer);
         int symbol = 0;
         if (*tokenizer == 35 || *tokenizer == 45)
         {
@@ -810,7 +810,7 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
         }
         else if (*tokenizer == 63 || *tokenizer == 33)
         {
-            const char* commandBuf = kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+            const char* commandBuf = kphandset::kpscr_GetCommand(pApp->scriptBuf);
             char* conditional = kphelpers::ReadScriptBuf(commandBuf + 1);
             if (STRBEGINS("lang:", conditional))
             {
@@ -844,45 +844,45 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
                 }
             }
         }
-        if (!symbol && pApp != (kphandset*)-6424 && !kphandset::kpscr_func_310B8(pApp->kphandset_unk99))
+        if (!symbol && pApp != (kphandset*)-6424 && !kphandset::kpscr_func_310B8(pApp->scriptBuf))
         {
-            const char* command = kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+            const char* command = kphandset::kpscr_GetCommand(pApp->scriptBuf);
             if (STRCMP("cutscene", command) == 0)
             {
                 if (pApp->flippedOpen)
-                    screen = kpcutscene::ExecuteCommand(pApp, pApp->kphandset_unk99);
+                    screen = kpcutscene::ExecuteCommand(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("still", command) == 0)
             {
-                screen = kpstill::ExecuteCommand(pApp, pApp->kphandset_unk99, (char*)"ui_full");
+                screen = kpstill::ExecuteCommand(pApp, pApp->scriptBuf, (char*)"ui_full");
             }
             /*else if (STRCMP("webstill", command) == 0)
             {
-                screen = kpscr_Command_Webstill(pApp, pApp->kphandset_unk99, "ui_full");
+                screen = kpscr_Command_Webstill(pApp, pApp->scriptBuf, "ui_full");
             }*/
             else if (STRCMP("enter", command) == 0)
             {
-                //screen = kphandset::kpscr_Command_Enter(pApp, pApp->kphandset_unk99);
+                //screen = kphandset::kpscr_Command_Enter(pApp, pApp->scriptBuf);
             }
             /*else if (STRCMP("bonus", command) == 0)
             {
-                screen = kpscr_Command_Bonus(pApp, pApp->kphandset_unk99);
+                screen = kpscr_Command_Bonus(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("camera", command) == 0)
             {
-                screen = kpscr_Command_Camera(pApp, pApp->kphandset_unk99);
+                screen = kpscr_Command_Camera(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("target", command) == 0)
             {
-                screen = kpscr_Command_Target(pApp, pApp->kphandset_unk99);
+                screen = kpscr_Command_Target(pApp, pApp->scriptBuf);
             }*/
             else if (STRCMP("wait", command) == 0)
             {
-                screen = kpwait::ExecuteCommand(pApp, pApp->kphandset_unk99);
+                screen = kpwait::ExecuteCommand(pApp, pApp->scriptBuf);
             }
             /*else if (STRCMP("missionmenu", command) == 0)
             {
-                screen = kpscr_Command_MissionMenu(pApp, pApp->kphandset_unk99);
+                screen = kpscr_Command_MissionMenu(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("endgame", command) == 0)
             {
@@ -890,67 +890,67 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
                 screen = kpscr_Command_EndGame(pApp, "s_timeout_two", pApp->global_alert_count, (BOOL(*)(kpstartup*, int, int, int))((char*)AEEMod_Load + 2));
                 pApp->kphandset_unk163 = 0;
                 pApp->globalTimeoutState = 100;
-            }
+            }*/
             else if (STRCMP("zodiac_trigger", command) == 0)
             {
-                kpscr_Command_ZodiacTrigger((int)pApp);
+                kphandset::kpscr_Command_ZodiacTrigger(pApp);
             }
-            else if (STRCMP("zodiac", command) == 0)
+            /*else if (STRCMP("zodiac", command) == 0)
             {
-                screen = kpscr_Command_Zodiac(pApp, pApp->kphandset_unk99);
+                screen = kpscr_Command_Zodiac(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("audio", command) == 0)
             {
-                kpscr_Command_Audio(pApp, pApp->kphandset_unk99);
+                kpscr_Command_Audio(pApp, pApp->scriptBuf);
             }
             else if (STRCMP("extract", command) == 0)
             {
-                extractBuf = kpscr_GetCommand(pApp->kphandset_unk99);
+                extractBuf = kpscr_GetCommand(pApp->scriptBuf);
                 kpscr_Command_Extract((int)pApp, extractBuf);
             }
             else if (STRCMP("ifextract", command) == 0)
             {
-                kpscr_Command_Ifextract(pApp, pApp->kphandset_unk99);
+                kpscr_Command_Ifextract(pApp, pApp->scriptBuf);
             }*/
             else if (STRCMP("goto", command) == 0)
             {
-                const char* gotoBuf = kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+                const char* gotoBuf = kphandset::kpscr_GetCommand(pApp->scriptBuf);
                 kphandset::kpscr_Command_Goto(pApp, gotoBuf);
             }
-            /*else if (STRCMP("ignore", command) == 0)
+            else if (STRCMP("ignore", command) == 0)
             {
-                ignoreBuf = kpscr_GetCommand(pApp->kphandset_unk99);
-                kpscr_Command_Ignore((char*)pApp, ignoreBuf);
-            }*/
+                const char* ignoreBuf = kphandset::kpscr_GetCommand(pApp->scriptBuf);
+                kpscr_Command_Ignore(pApp, ignoreBuf);
+            }
             else if (STRCMP("message", command) == 0)
             {
-                kphandset::kpscr_Command_Message(pApp, pApp->kphandset_unk99);
+                kphandset::kpscr_Command_Message(pApp, pApp->scriptBuf);
             }
-            /*else if (STRCMP("prepdate", command) == 0)
+            else if (STRCMP("prepdate", command) == 0)
             {
-                kpscr_Command_PrepDate(pApp);
-            }*/
+                kphandset::kpscr_Command_PrepDate(pApp);
+            }
             else if (STRCMP("preload", command) == 0)
             {
-                char* preloadBuf = (char*)kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+                char* preloadBuf = (char*)kphandset::kpscr_GetCommand(pApp->scriptBuf);
                 kphandset::kpscr_Command_Preload(pApp, preloadBuf);
             }
             else if (STRCMP("vibrate", command) == 0)
             {
-                kphandset::kpscr_Command_Vibrate(pApp, pApp->kphandset_unk99);
+                kphandset::kpscr_Command_Vibrate(pApp, pApp->scriptBuf);
             }
             /*else if (STRCMP("randomize", command) == 0)
             {
-                kpscr_Command_Randomize((int)pApp, pApp->kphandset_unk99);
+                kpscr_Command_Randomize((int)pApp, pApp->scriptBuf);
             }
             else if (STRCMP("setentry", command) == 0)
             {
-                kpscr_Command_SetEntry((int)pApp, pApp->kphandset_unk99);
-            }
+                kpscr_Command_SetEntry((int)pApp, pApp->scriptBuf);
+            }*/
             else if (STRCMP("clear", command) == 0)
             {
                 MEMSET(pApp->kphandset_unk150, 0, 9);
-            }*/
+            }
             else if (STRCMP("mark", command) == 0)
             {
                 kphandset::kpscr_Command_Mark(pApp);
@@ -965,12 +965,12 @@ void kphandset::kpscr_ParseScript(kphandset* pApp)
             }
             else if (STRCMP("set", command) == 0)
             {
-                char* setBuf = (char*)kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+                char* setBuf = (char*)kphandset::kpscr_GetCommand(pApp->scriptBuf);
                 kphandset::kpscr_Command_SetReset(pApp, setBuf, 1);
             }
             else if (STRCMP("reset", command) == 0)
             {
-                char* resetBuf = (char*)kphandset::kpscr_GetCommand(pApp->kphandset_unk99);
+                char* resetBuf = (char*)kphandset::kpscr_GetCommand(pApp->scriptBuf);
                 kphandset::kpscr_Command_SetReset(pApp, resetBuf, 0);
             }
             else
@@ -1204,6 +1204,28 @@ void kphandset::kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2)
 bool kphandset::kpscr_Tokenizer(int a1)
 {
     return a1 == 32 || a1 == 10 || a1 == 13 || a1 == 9;
+}
+void kphandset::kpscr_Command_ZodiacTrigger(kphandset* pApp)
+{
+    SNPRINTF(pApp->scratch, 400u, "activate%d", (unsigned char)pApp->kphandset_unk150[5]);
+    kpnetwork::CreateOutgoingMessage(pApp, pApp->scratch, 1);
+    kphandset::kpscr_func_1DDAC(pApp->pSelectedStartup);
+}
+void kphandset::kpscr_Command_PrepDate(kphandset* pApp)
+{
+    unsigned int numerator = (unsigned int)pApp;
+    uint32 v2 = GETTIMESECONDS();
+    GETJULIANDATE(v2, (JulianType*)&numerator);
+    MEMSET(pApp->kphandset_unk150, 0, 9);
+    pApp->kphandset_unk150[0] = (unsigned char)numerator;
+    pApp->kphandset_unk150[1] = ((unsigned char)numerator) - 1;
+    pApp->kphandset_unk150[2] = ((unsigned short)numerator / 0x64u);
+    pApp->kphandset_unk150[3] = ((unsigned short)numerator % 0x64u);
+}
+void kphandset::kpscr_Command_Ignore(kphandset* pApp, const char* commandBuffer)
+{
+    if (commandBuffer)
+        kphelpers::NullTerminatedString(pApp->kphandset_unk98_1, commandBuffer, 32);
 }
 void kphandset::kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip)
 {
@@ -1549,13 +1571,13 @@ static boolean kphandset_HandleEvent(AEEApplet* pMe, AEEEvent eCode, uint16 wPar
                     {
                         kpdebug::Print((char*)"FLIP open");
                         pApplet->flippedOpen = 1;
-                        ISHELL_SetTimer(pApplet->m_pIShell, 3000, (PFNNOTIFY)kphandset::func_28178, pApplet);
+                        ISHELL_SetTimer(pApplet->m_pIShell, 3000, (PFNNOTIFY)kphandset::RefreshBacklight, pApplet);
                     }
                     else
                     {
                         kpdebug::Print((char*)"FLIP closed");
                         pApplet->flippedOpen = 0;
-                        ISHELL_CancelTimer(pApplet->m_pIShell, (PFNNOTIFY)kphandset::func_28178, pApplet);
+                        ISHELL_CancelTimer(pApplet->m_pIShell, (PFNNOTIFY)kphandset::RefreshBacklight, pApplet);
                     }
                 }
                 else if (eCode != EVT_KEYGUARD) //1282

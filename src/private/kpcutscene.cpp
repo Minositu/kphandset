@@ -178,7 +178,7 @@ void kpcutscene::ParseKPSFile(kphandset* pApp, kpcutscene* pScreen)
     uint8* subtitle = (uint8*)(layer + 1);
     pScreen->subtitleStartFrame = subtitle;
     unsigned int subtitleIndex = 0;
-    pScreen->currentFilmstrip.kpfilmstrip_unk6 = 0;
+    pScreen->currentFilmstrip.subtitleBuf = 0;
     while (pScreen->currentFilmstrip.subtitleCount > subtitleIndex)
     {
         uint8* subtitleKey = subtitle + 4;
@@ -240,21 +240,21 @@ boolean kpcutscene::SubtitleHandler(kpcutscene* pScreen)
         return 0;
     boolean returnData = 0;
     kphandset* instance = (kphandset*)GETAPPINSTANCE();
-    while (!pScreen->currentFilmstrip.kpfilmstrip_unk6 || pScreen->currentFilmstrip.subtitleIndex < (int)pScreen->currentFilmstrip.subtitleCount && pScreen->currentFilmstrip.filmstripIndex >(int)pScreen->currentFilmstrip.kpfilmstrip_unk7_2)
+    while (!pScreen->currentFilmstrip.subtitleBuf || pScreen->currentFilmstrip.subtitleIndex < (int)pScreen->currentFilmstrip.subtitleCount && pScreen->currentFilmstrip.filmstripIndex >(int)pScreen->currentFilmstrip.kpfilmstrip_unk7_2)
     {
         returnData = 1;
-        if (pScreen->currentFilmstrip.kpfilmstrip_unk6)
+        if (pScreen->currentFilmstrip.subtitleBuf)
         {
-            for (pScreen->currentFilmstrip.kpfilmstrip_unk6 += 4; *pScreen->currentFilmstrip.kpfilmstrip_unk6; ++pScreen->currentFilmstrip.kpfilmstrip_unk6)
+            for (pScreen->currentFilmstrip.subtitleBuf += 4; *pScreen->currentFilmstrip.subtitleBuf; ++pScreen->currentFilmstrip.subtitleBuf)
             {
                 ;
             }
-            ++pScreen->currentFilmstrip.kpfilmstrip_unk6;
+            ++pScreen->currentFilmstrip.subtitleBuf;
             ++pScreen->currentFilmstrip.subtitleIndex;
         }
         else
         {
-            pScreen->currentFilmstrip.kpfilmstrip_unk6 = (char*)pScreen->subtitleStartFrame;
+            pScreen->currentFilmstrip.subtitleBuf = (char*)pScreen->subtitleStartFrame;
         }
         if (pScreen->currentFilmstrip.subtitleIndex >= (int)pScreen->currentFilmstrip.subtitleCount)
         {
@@ -263,8 +263,8 @@ boolean kpcutscene::SubtitleHandler(kpcutscene* pScreen)
         }
         else
         {
-            pScreen->currentFilmstrip.kpfilmstrip_unk7_1 = *(unsigned char*)pScreen->currentFilmstrip.kpfilmstrip_unk6 + (*((unsigned char*)pScreen->currentFilmstrip.kpfilmstrip_unk6 + 1) << 8);
-            pScreen->currentFilmstrip.kpfilmstrip_unk7_2 = *((unsigned char*)pScreen->currentFilmstrip.kpfilmstrip_unk6 + 2) + (*((unsigned char*)pScreen->currentFilmstrip.kpfilmstrip_unk6 + 3) << 8);
+            pScreen->currentFilmstrip.kpfilmstrip_unk7_1 = *(unsigned char*)pScreen->currentFilmstrip.subtitleBuf + (*((unsigned char*)pScreen->currentFilmstrip.subtitleBuf + 1) << 8);
+            pScreen->currentFilmstrip.kpfilmstrip_unk7_2 = *((unsigned char*)pScreen->currentFilmstrip.subtitleBuf + 2) + (*((unsigned char*)pScreen->currentFilmstrip.subtitleBuf + 3) << 8);
         }
         pScreen->currentFilmstrip.unk456456_3 = 0;
     }
@@ -282,7 +282,7 @@ boolean kpcutscene::SubtitleHandler(kpcutscene* pScreen)
         }
         else
         {
-            char* translation = kphelpers::ParseTranslation(instance, (const char*)pScreen->currentFilmstrip.kpfilmstrip_unk6 + 4);
+            char* translation = kphelpers::ParseTranslation(instance, (const char*)pScreen->currentFilmstrip.subtitleBuf + 4);
             kphandset::kpscr_subtitles_func_305F4(&instance->global_bottom, translation);
         }
     }

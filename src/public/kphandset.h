@@ -89,12 +89,11 @@ public:
 	uint8 subtitleCount;
 	uint8 subtitleIndex;
 	uint8 unk456456_3;						//
-	uint8 unk456456_4;						//
 	uint16 filmstripIndex;
-	uint16 kpfilmstrip_unk5_1;				//
-	char* kpfilmstrip_unk6;					//
+	char* subtitleBuf;
 	uint16 kpfilmstrip_unk7_1;				//
 	uint16 kpfilmstrip_unk7_2;				//
+	void* padding;							//Padding
 	uint32 UpTimeMS;
 	IImage* Image;
 };
@@ -123,6 +122,7 @@ public:
 	IFileMgr* pFileMgr;
 	IBacklight* pBacklight;
 	IGraphics* pGraphics;
+	uint8 unk_padding[28];							//Padding
 	ITypeface* pTypeface;
 	IHFont* pIFont_User1;
 	IHFont* pIFont_Large;
@@ -154,7 +154,7 @@ public:
 	char episode[2];
 	char kphandset_unk98_1[32];
 
-	char kphandset_unk99[192];
+	char scriptBuf[192];
 	void* kphandset_unk100;
 
 	char kphandset_unk148[8];
@@ -164,10 +164,10 @@ public:
 	uint8 kphandset_unk156[1106];
 	kpBottom global_bottom;
 	uint8 kphandset_isStartup1;
-	//padding 3 bytes
+	uint8 unk_padding_3[3];							//Padding
 	uint8 kpstartup1[4564];
 	uint8 kphandset_isStartup2;
-	//padding 3 bytes
+	uint8 unk_padding_4[3];							//Padding
 	uint8 kpstartup2[4564];
 	int global_timeout_remaining;
 	int globalTimeoutState;
@@ -187,11 +187,11 @@ public:
 	static void Sys_Init(kphandset* pApp);
 	static int CheckLowBattery(kphandset* pApp);
 	static char* InitScriptMgr(kphandset* pApp);
-	static int func_28178(kphandset* a1);
+	static int RefreshBacklight(kphandset* pApp); //28178
 	static bool kp_CheckToken(int a1);
 	static void InitFonts(kphandset* a1);
 	static void kpsys_PreloadUIImages(kphandset* pApp);
-	static void func_1C9EC(kphandset* a1);
+	static void PrintRamUsage(kphandset* a1);
 	static void* FetchScreen(kphandset* a1);
 	static void kpscr_func_1DDAC(kpscreen* a1);
 	static void kp_func_2A334(kpscreen* a1);
@@ -218,6 +218,9 @@ public:
 	static void kpscr_InitBottomBar(kpBottom* a1, const char* a2, const char* a3);
 	static void kpscr_subtitles_func_305F4(kpBottom* a1, const char* a2);
 	static bool kpscr_Tokenizer(int a1);
+	static void kpscr_Command_ZodiacTrigger(kphandset* pApp);
+	static void kpscr_Command_PrepDate(kphandset* pApp);
+	static void kpscr_Command_Ignore(kphandset* pApp, const char* commandBuffer);
 	static void kpscr_Command_Preload(kphandset* pApp, char* pFilmstrip);
 	static void kpscr_Command_Vibrate(kphandset* a1, char* a2);
 	static void kpscr_Command_Message(kphandset* a1, char* a2);

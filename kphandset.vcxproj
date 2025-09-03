@@ -153,34 +153,48 @@
     </ClCompile>
     <ClCompile Include="src\private\kpadmin.cpp" />
     <ClCompile Include="src\private\kpaudio.cpp" />
+    <ClCompile Include="src\private\kpbonus.cpp" />
     <ClCompile Include="src\private\kpcamera.cpp" />
     <ClCompile Include="src\private\kpclient.cpp" />
     <ClCompile Include="src\private\kpcutscene.cpp" />
     <ClCompile Include="src\private\kpdebug.cpp" />
+    <ClCompile Include="src\private\kpendgame.cpp" />
+    <ClCompile Include="src\private\kpenter.cpp" />
     <ClCompile Include="src\private\kphandset.cpp" />
     <ClCompile Include="src\private\kphelpers.cpp" />
+    <ClCompile Include="src\private\kpmissionmenu.cpp" />
     <ClCompile Include="src\private\kpnetwork.cpp" />
     <ClCompile Include="src\private\kpscreen.cpp" />
     <ClCompile Include="src\private\kpstill.cpp" />
+    <ClCompile Include="src\private\kptarget.cpp" />
     <ClCompile Include="src\private\kptimeout.cpp" />
     <ClCompile Include="src\private\kpupdate.cpp" />
     <ClCompile Include="src\private\kpwait.cpp" />
+    <ClCompile Include="src\private\kpwebstill.cpp" />
+    <ClCompile Include="src\private\kpzodiac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\public\kpadmin.h" />
     <ClInclude Include="src\public\kpaudio.h" />
+    <ClInclude Include="src\public\kpbonus.h" />
     <ClInclude Include="src\public\kpcamera.h" />
     <ClInclude Include="src\public\kpclient.h" />
     <ClInclude Include="src\public\kpcutscene.h" />
     <ClInclude Include="src\public\kpdebug.h" />
+    <ClInclude Include="src\public\kpendgame.h" />
+    <ClInclude Include="src\public\kpenter.h" />
     <ClInclude Include="src\public\kphandset.h" />
     <ClInclude Include="src\public\kphelpers.h" />
+    <ClInclude Include="src\public\kpmissionmenu.h" />
     <ClInclude Include="src\public\kpnetwork.h" />
     <ClInclude Include="src\public\kpscreen.h" />
     <ClInclude Include="src\public\kpstill.h" />
+    <ClInclude Include="src\public\kptarget.h" />
     <ClInclude Include="src\public\kptimeout.h" />
     <ClInclude Include="src\public\kpupdate.h" />
     <ClInclude Include="src\public\kpwait.h" />
+    <ClInclude Include="src\public\kpwebstill.h" />
+    <ClInclude Include="src\public\kpzodiac.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
